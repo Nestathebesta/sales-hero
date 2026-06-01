@@ -5,6 +5,7 @@
     "skin": "default",
     "totalXP": 0,
     "level": 1,
+    "title": "Squire",
     "rewards": [],
     "badges": [],
     "stats": {
@@ -14,5 +15,5 @@
     }
   },
   "leads": {},
-  "globalEvents": ["Welcome to the Sales Guild! Open Action Lab and log your first pipeline activity."]
+  "globalEvents": ["Welcome to the Sales Crusade! Open Action Lab and log your first pipeline activity."]
 }

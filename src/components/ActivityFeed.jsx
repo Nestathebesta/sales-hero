@@ -6,7 +6,7 @@ const ActivityFeed = ({ events }) => {
   const latestEvent =
     events && events.length > 0
       ? events[0]
-      : 'Welcome to the Sales Guild! Open Action Lab and log your first pipeline activity.';
+      : 'Welcome to the Sales Crusade! Open Action Lab and log your first pipeline activity.';
 
   useEffect(() => {
     let i = 0;

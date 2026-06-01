@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { syncPlayerProgression } = require('./xpEngine');
 
 const DATA_FILE = path.join(__dirname, 'data.json');
 
@@ -10,6 +11,7 @@ const defaultState = {
     skin: "default",
     totalXP: 0,
     level: 1,
+    title: "Squire",
     rewards: [],
     badges: [],
     stats: {
@@ -19,8 +21,18 @@ const defaultState = {
     }
   },
   leads: {},
-  globalEvents: ["Welcome to the Sales Guild! Open Action Lab and log your first pipeline activity."]
+  globalEvents: ["Welcome to the Sales Crusade! Open Action Lab and log your first pipeline activity."]
 };
+
+function normalizePlayer(player) {
+  return syncPlayerProgression({
+    ...defaultState.player,
+    ...player,
+    stats: { ...defaultState.player.stats, ...player.stats },
+    badges: player.badges ?? [],
+    rewards: player.rewards ?? [],
+  });
+}
 
 function readState() {
   if (!fs.existsSync(DATA_FILE)) {
@@ -31,8 +43,13 @@ function readState() {
   try {
     const parsed = JSON.parse(data);
     if (!parsed.globalEvents) parsed.globalEvents = defaultState.globalEvents;
-    if (!parsed.player.stats) parsed.player.stats = defaultState.player.stats;
-    if (!parsed.player.badges) parsed.player.badges = [];
+    parsed.player = normalizePlayer(parsed.player ?? defaultState.player);
+    if (parsed.leads) {
+      const { calculateLevel } = require('./xpEngine');
+      for (const id of Object.keys(parsed.leads)) {
+        parsed.leads[id].level = calculateLevel(parsed.leads[id].xp ?? 0);
+      }
+    }
     return parsed;
   } catch(e) {
     return defaultState;

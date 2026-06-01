@@ -76,7 +76,7 @@ All **P0** features were already shipped. **P1** items were verified complete in
 | Sprint | Focus | Status |
 |--------|-------|--------|
 | 1 | Sales Guild rebrand, original SVG avatars, copy refresh | **Done** (June 2026) |
-| 2 | Proper XP curve + career titles | Pending |
+| 2 | XP curve, career ranks, crusader UI, level-up toast | **Done** (June 2026) |
 | 3 | activityLog, daily goals, streaks | Pending |
 | 4 | Performance dashboard + charts | Pending |
 | 5 | Level-up UX, pipeline stages, expanded medals | Pending |

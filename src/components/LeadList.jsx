@@ -1,9 +1,4 @@
-const XP_THRESHOLDS = [100, 500, 1000, 5000, 10000];
-
-function getXpForNextLevel(level) {
-  if (level <= 0 || level > XP_THRESHOLDS.length) return 10000;
-  return XP_THRESHOLDS[level - 1];
-}
+import { xpProgressInLevel } from '../../shared/xp.js';
 
 const PRODUCT_ICONS = {
   auto: '🚗',
@@ -28,7 +23,7 @@ const LeadList = ({ leads }) => {
   if (leadArray.length === 0) {
     return (
       <div className="panel lead-panel empty-state">
-        <div className="empty-icon" aria-hidden="true">📋</div>
+        <div className="empty-icon" aria-hidden="true">⚔</div>
         <h2>Pipeline Empty</h2>
         <p>Head to <strong>Action Lab</strong> and log your first call, quote, or close.</p>
       </div>
@@ -37,12 +32,11 @@ const LeadList = ({ leads }) => {
 
   return (
     <div className="panel lead-panel">
-      <h2 className="panel-title panel-title--red">Active Pipeline</h2>
-      <p className="panel-subtitle">{leadArray.length} prospect{leadArray.length !== 1 ? 's' : ''} in progress</p>
+      <h2 className="panel-title panel-title--crimson">Active Pipeline</h2>
+      <p className="panel-subtitle">{leadArray.length} prospect{leadArray.length !== 1 ? 's' : ''} in the crusade</p>
       <div className="lead-list-container">
         {leadArray.map((lead) => {
-          const nextXp = getXpForNextLevel(lead.level);
-          const progress = Math.min(100, Math.floor((lead.xp / nextXp) * 100));
+          const { percent } = xpProgressInLevel(lead.xp, lead.level);
           return (
             <div key={lead.id} className="lead-item">
               <div className="lead-avatar lead-avatar--icon" aria-hidden="true">
@@ -51,11 +45,11 @@ const LeadList = ({ leads }) => {
               <div className="lead-info">
                 <h3>{lead.name}</h3>
                 <div className="lead-stats">
-                  <span className="level-badge">LVL {lead.level}</span>
-                  <span className="lead-xp">EXP: {lead.xp}</span>
+                  <span className="level-badge">Lv {lead.level}</span>
+                  <span className="lead-xp">{lead.xp} EXP</span>
                 </div>
                 <div className="lead-progress">
-                  <div className="lead-progress-bar" style={{ width: `${progress}%` }} />
+                  <div className="lead-progress-bar" style={{ width: `${percent}%` }} />
                 </div>
               </div>
               <div className="lead-meta">

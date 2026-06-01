@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Briefcase, Zap } from 'lucide-react';
 import Character from './components/Character';
 import LeadList from './components/LeadList';
 import Inventory from './components/Inventory';
 import ActivityFeed from './components/ActivityFeed';
 import Badges from './components/Badges';
+import LevelUpToast from './components/LevelUpToast';
 import { fetchState, customizePlayer } from './api';
 
 function App() {
@@ -12,10 +13,25 @@ function App() {
   const [activeTab, setActiveTab] = useState('leads');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [levelUpNotice, setLevelUpNotice] = useState(null);
+  const prevLevelRef = useRef(null);
 
   const loadState = async () => {
     try {
       const state = await fetchState();
+      const nextLevel = state.player?.level;
+      if (
+        prevLevelRef.current !== null &&
+        nextLevel != null &&
+        nextLevel > prevLevelRef.current
+      ) {
+        setLevelUpNotice({
+          level: nextLevel,
+          title: state.player.title ?? 'Squire',
+        });
+      }
+      if (nextLevel != null) prevLevelRef.current = nextLevel;
+
       setGameState(state);
       setError(null);
     } catch (err) {
@@ -47,21 +63,33 @@ function App() {
 
   return (
     <div className="app-container">
+      {levelUpNotice && (
+        <LevelUpToast
+          level={levelUpNotice.level}
+          title={levelUpNotice.title}
+          onDismiss={() => setLevelUpNotice(null)}
+        />
+      )}
+
       <header className="header">
-        <div className="header-badge">Sales Guild · P&amp;C Edition</div>
+        <div className="header-badge">The Sales Crusade · P&amp;C</div>
         <h1>SalesDex</h1>
-        <p className="header-tagline">Level up your production.</p>
+        <p className="header-tagline">Forge your legacy.</p>
       </header>
 
       {player && (
         <div className="hud-bar">
           <div className="hud-stat">
-            <span className="hud-label">Agent</span>
+            <span className="hud-label">Crusader</span>
             <span className="hud-value">{player.name}</span>
           </div>
           <div className="hud-stat">
+            <span className="hud-label">Rank</span>
+            <span className="hud-value hud-highlight">{player.title ?? 'Squire'}</span>
+          </div>
+          <div className="hud-stat">
             <span className="hud-label">Level</span>
-            <span className="hud-value hud-highlight">{player.level}</span>
+            <span className="hud-value">{player.level}</span>
           </div>
           <div className="hud-stat">
             <span className="hud-label">Total EXP</span>
@@ -72,7 +100,7 @@ function App() {
             <span className="hud-value">{leadCount}</span>
           </div>
           <div className="hud-stat">
-            <span className="hud-label">Guild Medals</span>
+            <span className="hud-label">Medals</span>
             <span className="hud-value">{player.badges?.length ?? 0}/3</span>
           </div>
         </div>
@@ -81,14 +109,14 @@ function App() {
       {loading && (
         <div className="loading-panel">
           <div className="loading-spinner" aria-hidden="true" />
-          <p>Loading your guild profile...</p>
+          <p>Preparing the crusade...</p>
         </div>
       )}
 
       {error && !loading && (
         <div className="error-panel" role="alert">
           <p>{error}</p>
-          <button type="button" className="game-btn game-btn--blue" onClick={loadState}>
+          <button type="button" className="game-btn game-btn--gold" onClick={loadState}>
             Retry Connection
           </button>
         </div>

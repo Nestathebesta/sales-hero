@@ -1,9 +1,8 @@
-const XP_THRESHOLDS = [100, 500, 1000, 5000, 10000];
-
-function getXpForNextLevel(level) {
-  if (level <= 0 || level > XP_THRESHOLDS.length) return 10000;
-  return XP_THRESHOLDS[level - 1];
-}
+import {
+  APPEARANCE_OPTIONS,
+  unlockLevelForReward,
+  xpProgressInLevel,
+} from '../../shared/xp.js';
 
 function avatarSrc(character, skin) {
   return `/avatars/${character}_${skin}.svg`;
@@ -12,66 +11,66 @@ function avatarSrc(character, skin) {
 const Character = ({ player, onCustomize }) => {
   if (!player) return null;
 
-  const xpForNextLevel = getXpForNextLevel(player.level);
-  const progressPercent = Math.min(100, Math.floor((player.totalXP / xpForNextLevel) * 100));
-
-  const availableSkins = [
-    { id: 'boy_default', character: 'boy', skin: 'default', label: 'Rookie Agent', unlocked: true },
-    { id: 'girl_default', character: 'girl', skin: 'default', label: 'Associate Producer', unlocked: player.rewards.includes('girl') },
-    { id: 'boy_champion', character: 'boy', skin: 'champion', label: 'Senior Producer', unlocked: player.rewards.includes('boy_champion') },
-    { id: 'girl_champion', character: 'girl', skin: 'champion', label: 'Guild Elite', unlocked: player.rewards.includes('girl_champion') },
-  ];
+  const { current, needed, percent } = xpProgressInLevel(player.totalXP, player.level);
 
   return (
-    <div className="panel hero-panel">
-      <h2 className="panel-title panel-title--blue">Guild Agent Card</h2>
+    <div className="panel hero-panel crusader-card">
+      <h2 className="panel-title panel-title--gold">Crusader Card</h2>
 
       <div className="agent-header">
-        <img
-          className="pixel-icon"
-          src={avatarSrc(player.character, player.skin)}
-          alt={`${player.character} ${player.skin} avatar`}
-        />
+        <div className="avatar-frame">
+          <img
+            className="agent-portrait"
+            src={avatarSrc(player.character, player.skin)}
+            alt={`${player.title} avatar`}
+          />
+        </div>
         <div>
           <h3 className="agent-name">{player.name}</h3>
-          <p className="agent-level">LVL {player.level}</p>
+          <p className="agent-rank">{player.title ?? 'Squire'}</p>
+          <p className="agent-level">Level {player.level}</p>
         </div>
       </div>
 
       <div className="xp-section">
         <div className="xp-labels">
-          <span>EXP: <strong>{player.totalXP}</strong></span>
-          <span>Next LVL: <strong>{xpForNextLevel}</strong></span>
+          <span>EXP <strong>{player.totalXP}</strong></span>
+          <span><strong>{current}</strong> / {needed} to next</span>
         </div>
         <div className="progress-container">
-          <div className="progress-bar" style={{ width: `${progressPercent}%` }} />
-          <div className="progress-text">{progressPercent}%</div>
+          <div className="progress-bar" style={{ width: `${percent}%` }} />
+          <div className="progress-text">{percent}%</div>
         </div>
       </div>
 
       <div className="customize-section">
-        <h4 className="section-label">Guild Rank Appearance</h4>
+        <h4 className="section-label">Rank Appearances</h4>
         <div className="customization-grid">
-          {availableSkins.map((skin) => {
+          {APPEARANCE_OPTIONS.map((skin) => {
+            const unlocked = !skin.rewardKey || player.rewards.includes(skin.rewardKey);
             const isSelected = player.character === skin.character && player.skin === skin.skin;
+            const unlockAt = skin.rewardKey ? unlockLevelForReward(skin.rewardKey) : null;
+
             return (
               <label
                 key={skin.id}
-                className={`custom-radio-label ${!skin.unlocked ? 'locked' : ''} ${isSelected ? 'selected' : ''}`}
+                className={`custom-radio-label ${!unlocked ? 'locked' : ''} ${isSelected ? 'selected' : ''}`}
               >
                 <input
                   type="radio"
                   name="characterSkin"
                   className="custom-radio"
                   checked={isSelected}
-                  disabled={!skin.unlocked}
+                  disabled={!unlocked}
                   onChange={() => {
-                    if (skin.unlocked) onCustomize(skin.character, skin.skin);
+                    if (unlocked) onCustomize(skin.character, skin.skin);
                   }}
                 />
                 <img src={avatarSrc(skin.character, skin.skin)} alt={skin.label} />
                 <span>{skin.label}</span>
-                {!skin.unlocked && <span className="locked-tag">Locked</span>}
+                {!unlocked && unlockAt && (
+                  <span className="locked-tag">Lv {unlockAt}</span>
+                )}
               </label>
             );
           })}
