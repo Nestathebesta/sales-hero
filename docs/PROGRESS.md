@@ -48,15 +48,24 @@ git remote add origin https://github.com/YOUR-USERNAME/sales-hero.git
 git push -u origin main
 ```
 
-### Vercel
+### Vercel — deployed
 
-Vercel CLI is not installed locally. After push:
+| Item | Value |
+|------|--------|
+| **Production URL** | https://sales-hero.vercel.app |
+| **Project** | `nestastreet-3165s-projects/sales-hero` |
+| **GitHub** | https://github.com/Nestathebesta/sales-hero (connected via `vercel link`) |
+| **Method** | Vercel CLI (`npx vercel link --yes`, `npx vercel --yes`) |
+| **Build** | `npm run build` → `dist` (Vite preset auto-detected) |
+| **SPA routing** | `vercel.json` rewrites |
 
-1. Open https://vercel.com/new
-2. Import `https://github.com/YOUR-USERNAME/sales-hero`
-3. Preset: **Vite** — Build: `npm run build` — Output: `dist`
-4. Env: `VITE_API_URL` = your deployed API URL (Railway/Render/etc.)
-5. Deploy `server/` separately; see README.
+**Env vars on Vercel:** none set yet. The app falls back to `http://localhost:3001` when `VITE_API_URL` is unset — fine for static UI preview; set `VITE_API_URL` after deploying the API:
+
+```powershell
+npx vercel env add VITE_API_URL production preview development
+# Value: https://your-api-host.example.com (no trailing slash)
+npx vercel --prod
+```
 
 ## PRD Phase 1 (MVP polish) — summary
 
