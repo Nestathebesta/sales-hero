@@ -1,6 +1,6 @@
 # SalesDex
 
-**Gotta close 'em all!** — A gamified sales progression game for P&C insurance agents. Log calls, send quotes, and close policies to earn XP, level up your agent, unlock avatars, and collect gym-style badges—all wrapped in a retro RPG interface.
+**Level up your production.** — A gamified sales progression app for P&C insurance agents. Log calls, send quotes, and close policies to earn XP, rank up in the Sales Guild, unlock agent appearances, and collect guild medals—all wrapped in a retro RPG interface.
 
 ![Stack](https://img.shields.io/badge/React-19-61DAFB) ![Vite](https://img.shields.io/badge/Vite-8-646CFF) ![Express](https://img.shields.io/badge/Express-5-000000)
 
@@ -8,14 +8,14 @@
 
 1. **Start both servers** (see [Local setup](#local-setup) below).
 2. Open the app at `http://localhost:5173`.
-3. Read the **Battle Log** at the top—it narrates your sales journey.
+3. Read the **Activity Feed** at the top—it narrates your sales journey.
 4. Open the **Action Lab** tab, pick a prospect, and trigger an action:
    - **Dialed Lead** (+30 EXP) — simulates a RingCentral call
    - **Sent Quote** (+30 EXP) — simulates AgencyZoom quote
    - **Closed Policy** (+100 EXP) — simulates a closed policy
-5. Switch to **Encounters** to see prospects level up as you work them.
-6. Watch your **Agent Card** XP bar and unlock new skins at levels 2–4.
-7. Earn **Achievements**: Dialer Badge (25 calls), Quote Master (10 quotes), Closer Badge (1 policy).
+5. Switch to **Pipeline** to see prospects level up as you work them.
+6. Watch your **Guild Agent Card** XP bar and unlock new ranks at levels 2–4.
+7. Earn **Guild Medals**: Dialer Badge (25 calls), Quote Master (10 quotes), Closer Badge (1 policy).
 
 ## Features
 
@@ -23,9 +23,9 @@
 |---------|-------------|
 | P&C XP Engine | 30 XP calls/quotes, 100 XP closed policies |
 | Agent leveling | Levels 1–6 based on total XP |
-| Lead encounters | Each prospect has its own XP and level |
-| Battle log | Typewriter-style RPG dialogue for recent events |
-| Avatar unlocks | Trainer and Champion skins at higher levels |
+| Lead pipeline | Each prospect has its own XP and level |
+| Activity feed | Typewriter-style feed for recent events |
+| Rank unlocks | Rookie through Guild Elite appearances at higher levels |
 | Zapier-ready API | `POST /webhook` for real automation (simulator included) |
 
 ## Architecture

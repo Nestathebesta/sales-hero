@@ -71,6 +71,17 @@ npx vercel --prod
 
 All **P0** features were already shipped. **P1** items were verified complete in code/docs; no additional feature code required for minimal launch.
 
+## Enhancement roadmap
+
+| Sprint | Focus | Status |
+|--------|-------|--------|
+| 1 | Sales Guild rebrand, original SVG avatars, copy refresh | **Done** (June 2026) |
+| 2 | Proper XP curve + career titles | Pending |
+| 3 | activityLog, daily goals, streaks | Pending |
+| 4 | Performance dashboard + charts | Pending |
+| 5 | Level-up UX, pipeline stages, expanded medals | Pending |
+| 6 | Supabase + multi-agent | Pending |
+
 ## Next (post-push)
 
 1. Deploy `server/` with persistent storage or plan DB migration.

@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 
-const BattleLog = ({ events }) => {
+const ActivityFeed = ({ events }) => {
   const [displayText, setDisplayText] = useState('');
 
   const latestEvent =
     events && events.length > 0
       ? events[0]
-      : 'Welcome to SalesDex! Head to Action Lab and trigger your first encounter.';
+      : 'Welcome to the Sales Guild! Open Action Lab and log your first pipeline activity.';
 
   useEffect(() => {
     let i = 0;
@@ -24,9 +24,9 @@ const BattleLog = ({ events }) => {
   }, [latestEvent]);
 
   return (
-    <div className="battle-log">
-      <div className="battle-log-label">Battle Log</div>
-      <div className="battle-log-text">
+    <div className="activity-feed">
+      <div className="activity-feed-label">Activity Feed</div>
+      <div className="activity-feed-text">
         {displayText}
         <span className="cursor-blink" aria-hidden="true">▼</span>
       </div>
@@ -34,4 +34,4 @@ const BattleLog = ({ events }) => {
   );
 };
 
-export default BattleLog;
+export default ActivityFeed;

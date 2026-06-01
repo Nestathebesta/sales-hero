@@ -5,31 +5,48 @@ function getXpForNextLevel(level) {
   return XP_THRESHOLDS[level - 1];
 }
 
+const PRODUCT_ICONS = {
+  auto: '🚗',
+  home: '🏠',
+  umbrella: '☂️',
+  commercial: '🏢',
+  life: '💼',
+};
+
+function productIcon(lead) {
+  const line = lead.productLine?.toLowerCase();
+  if (line && PRODUCT_ICONS[line]) return PRODUCT_ICONS[line];
+  if (lead.id === 'lead_1') return PRODUCT_ICONS.auto;
+  if (lead.id === 'lead_2') return PRODUCT_ICONS.home;
+  if (lead.id === 'lead_3') return PRODUCT_ICONS.umbrella;
+  return '📋';
+}
+
 const LeadList = ({ leads }) => {
   const leadArray = Object.values(leads || {}).sort((a, b) => b.xp - a.xp);
 
   if (leadArray.length === 0) {
     return (
       <div className="panel lead-panel empty-state">
-        <div className="empty-icon" aria-hidden="true">?</div>
-        <h2>No Encounters Yet</h2>
-        <p>Head to the <strong>Action Lab</strong> tab and trigger your first prospect encounter!</p>
+        <div className="empty-icon" aria-hidden="true">📋</div>
+        <h2>Pipeline Empty</h2>
+        <p>Head to <strong>Action Lab</strong> and log your first call, quote, or close.</p>
       </div>
     );
   }
 
   return (
     <div className="panel lead-panel">
-      <h2 className="panel-title panel-title--red">Active Encounters</h2>
-      <p className="panel-subtitle">{leadArray.length} prospect{leadArray.length !== 1 ? 's' : ''} in the wild</p>
+      <h2 className="panel-title panel-title--red">Active Pipeline</h2>
+      <p className="panel-subtitle">{leadArray.length} prospect{leadArray.length !== 1 ? 's' : ''} in progress</p>
       <div className="lead-list-container">
         {leadArray.map((lead) => {
           const nextXp = getXpForNextLevel(lead.level);
           const progress = Math.min(100, Math.floor((lead.xp / nextXp) * 100));
           return (
             <div key={lead.id} className="lead-item">
-              <div className="lead-avatar" aria-hidden="true">
-                {lead.name.charAt(0)}
+              <div className="lead-avatar lead-avatar--icon" aria-hidden="true">
+                {productIcon(lead)}
               </div>
               <div className="lead-info">
                 <h3>{lead.name}</h3>
@@ -42,7 +59,7 @@ const LeadList = ({ leads }) => {
                 </div>
               </div>
               <div className="lead-meta">
-                <div className="lead-number">No. {lead.id.substring(0, 3).padStart(3, '0')}</div>
+                <div className="lead-number">{lead.id.replace('_', '-').toUpperCase()}</div>
                 <div>{lead.events.length} action{lead.events.length !== 1 ? 's' : ''}</div>
               </div>
             </div>

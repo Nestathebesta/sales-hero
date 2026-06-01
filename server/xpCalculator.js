@@ -70,21 +70,21 @@ function processEvent(leadId, eventType, contactInfo = {}) {
     }
 
     if (badgeEarned) {
-      addGlobalEvent(`Agent ${player.name} earned the ${badgeEarned}!`);
+      addGlobalEvent(`Guild agent ${player.name} earned the ${badgeEarned}!`);
     }
 
     // Check level up for lead
     const newLeadLevel = calculateLevel(lead.xp);
     if (newLeadLevel > lead.level) {
       lead.level = newLeadLevel;
-      addGlobalEvent(`${lead.name} is warming up! (LVL ${lead.level})`);
+      addGlobalEvent(`${lead.name} advanced in the pipeline! (LVL ${lead.level})`);
     }
 
     // Check level up for player
     const newPlayerLevel = calculateLevel(player.totalXP);
     if (newPlayerLevel > player.level) {
       player.level = newPlayerLevel;
-      addGlobalEvent(`Agent ${player.name} reached LVL ${player.level}!`);
+      addGlobalEvent(`Guild agent ${player.name} reached LVL ${player.level}!`);
       
       // Reward skin/race unlocks based on player level
       if (player.level >= 2 && !player.rewards.includes("girl")) player.rewards.push("girl");
@@ -104,7 +104,7 @@ function processEvent(leadId, eventType, contactInfo = {}) {
     if (eventType === "insurance/quote") actionText = "sent a P&C quote to";
     if (eventType === "insurance/closed_policy") actionText = "closed a policy for";
     
-    addGlobalEvent(`Agent ${player.name} ${actionText} ${lead.name}. (+${earnedXP} EXP)`);
+    addGlobalEvent(`${player.name} ${actionText} ${lead.name}. (+${earnedXP} EXP)`);
   }
 
   saveLead(leadId, lead);

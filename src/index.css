@@ -10,8 +10,9 @@
   --accent-blue: #457b9d;
   --accent-yellow: #f4a261;
   --accent-green: #2a9d8f;
-  --pokemon-yellow: #ffcb05;
-  --pokemon-blue: #3c5aa6;
+  --guild-gold: #c9a227;
+  --guild-navy: #1e3a5f;
+  --guild-emerald: #2a9d8f;
   --pixel-font: 'Outfit', sans-serif;
   --header-font: 'Press Start 2P', cursive;
 }
@@ -95,7 +96,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .header-badge {
   display: inline-block;
-  background: var(--pokemon-blue);
+  background: var(--guild-navy);
   color: #fff;
   font-family: var(--header-font);
   font-size: 0.55rem;
@@ -106,9 +107,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .header h1 {
-  color: var(--pokemon-yellow);
-  -webkit-text-stroke: 2px var(--pokemon-blue);
-  text-shadow: 4px 4px 0px var(--pokemon-blue);
+  color: var(--guild-gold);
+  -webkit-text-stroke: 2px var(--guild-navy);
+  text-shadow: 4px 4px 0px var(--guild-navy);
   font-size: clamp(2rem, 6vw, 3.5rem);
   letter-spacing: 2px;
   margin-bottom: 0.5rem;
@@ -189,12 +190,12 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--accent-red);
 }
 
-/* Battle Log */
-.battle-log-row {
+/* Activity Feed */
+.activity-feed-row {
   grid-column: 1 / -1;
 }
 
-.battle-log {
+.activity-feed {
   background: #fff;
   border: 6px solid var(--panel-border);
   border-radius: 12px;
@@ -204,14 +205,14 @@ h1, h2, h3, h4, h5, h6 {
   position: relative;
 }
 
-.battle-log-label {
+.activity-feed-label {
   font-family: var(--header-font);
   font-size: 0.5rem;
   color: var(--accent-red);
   margin-bottom: 0.5rem;
 }
 
-.battle-log::after {
+.activity-feed::after {
   content: '';
   position: absolute;
   bottom: 10px;
@@ -229,7 +230,7 @@ h1, h2, h3, h4, h5, h6 {
   50% { transform: translateY(5px); }
 }
 
-.battle-log-text {
+.activity-feed-text {
   font-family: var(--header-font);
   font-size: 0.75rem;
   line-height: 1.8;
@@ -505,6 +506,13 @@ h1, h2, h3, h4, h5, h6 {
   flex-shrink: 0;
 }
 
+.lead-avatar--icon {
+  font-size: 1.75rem;
+  font-family: var(--pixel-font);
+  background: linear-gradient(135deg, #e8eef4, #fff);
+  border-color: var(--guild-navy);
+}
+
 .lead-info {
   flex-grow: 1;
   min-width: 0;
@@ -763,12 +771,12 @@ h1, h2, h3, h4, h5, h6 {
 
 .game-btn--blue {
   background: var(--accent-blue);
-  border-color: var(--pokemon-blue);
+  border-color: var(--guild-navy);
   color: #fff;
 }
 
 /* Layout */
-.battle-log-row,
+.activity-feed-row,
 .hud-bar,
 .loading-panel,
 .error-panel,

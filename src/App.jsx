@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Swords, Zap } from 'lucide-react';
+import { Briefcase, Zap } from 'lucide-react';
 import Character from './components/Character';
 import LeadList from './components/LeadList';
 import Inventory from './components/Inventory';
-import BattleLog from './components/BattleLog';
+import ActivityFeed from './components/ActivityFeed';
 import Badges from './components/Badges';
 import { fetchState, customizePlayer } from './api';
 
@@ -48,9 +48,9 @@ function App() {
   return (
     <div className="app-container">
       <header className="header">
-        <div className="header-badge">P&amp;C Insurance Edition</div>
+        <div className="header-badge">Sales Guild · P&amp;C Edition</div>
         <h1>SalesDex</h1>
-        <p className="header-tagline">Gotta close &apos;em all!</p>
+        <p className="header-tagline">Level up your production.</p>
       </header>
 
       {player && (
@@ -68,11 +68,11 @@ function App() {
             <span className="hud-value">{player.totalXP}</span>
           </div>
           <div className="hud-stat">
-            <span className="hud-label">Encounters</span>
+            <span className="hud-label">Pipeline</span>
             <span className="hud-value">{leadCount}</span>
           </div>
           <div className="hud-stat">
-            <span className="hud-label">Badges</span>
+            <span className="hud-label">Guild Medals</span>
             <span className="hud-value">{player.badges?.length ?? 0}/3</span>
           </div>
         </div>
@@ -81,7 +81,7 @@ function App() {
       {loading && (
         <div className="loading-panel">
           <div className="loading-spinner" aria-hidden="true" />
-          <p>Loading your adventure...</p>
+          <p>Loading your guild profile...</p>
         </div>
       )}
 
@@ -95,8 +95,8 @@ function App() {
       )}
 
       {gameState && (
-        <div className="battle-log-row">
-          <BattleLog events={gameState.globalEvents} />
+        <div className="activity-feed-row">
+          <ActivityFeed events={gameState.globalEvents} />
         </div>
       )}
 
@@ -116,8 +116,8 @@ function App() {
             className={`tab-btn ${activeTab === 'leads' ? 'active' : ''}`}
             onClick={() => setActiveTab('leads')}
           >
-            <Swords size={14} aria-hidden="true" />
-            Encounters
+            <Briefcase size={14} aria-hidden="true" />
+            Pipeline
           </button>
           <button
             type="button"

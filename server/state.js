@@ -5,7 +5,7 @@ const DATA_FILE = path.join(__dirname, 'data.json');
 
 const defaultState = {
   player: {
-    name: "Ash",
+    name: "Agent",
     character: "boy",
     skin: "default",
     totalXP: 0,
@@ -19,7 +19,7 @@ const defaultState = {
     }
   },
   leads: {},
-  globalEvents: ["Welcome to SalesDex! Head to Action Lab and trigger your first encounter."]
+  globalEvents: ["Welcome to the Sales Guild! Open Action Lab and log your first pipeline activity."]
 };
 
 function readState() {

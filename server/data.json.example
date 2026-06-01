@@ -1,6 +1,6 @@
 {
   "player": {
-    "name": "Ash",
+    "name": "Agent",
     "character": "boy",
     "skin": "default",
     "totalXP": 0,
@@ -14,5 +14,5 @@
     }
   },
   "leads": {},
-  "globalEvents": ["Welcome to SalesDex! Head to Action Lab and trigger your first encounter."]
+  "globalEvents": ["Welcome to the Sales Guild! Open Action Lab and log your first pipeline activity."]
 }

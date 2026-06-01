@@ -6,7 +6,7 @@ function getXpForNextLevel(level) {
 }
 
 function avatarSrc(character, skin) {
-  return `/avatars/${character}_${skin}.png`;
+  return `/avatars/${character}_${skin}.svg`;
 }
 
 const Character = ({ player, onCustomize }) => {
@@ -16,15 +16,15 @@ const Character = ({ player, onCustomize }) => {
   const progressPercent = Math.min(100, Math.floor((player.totalXP / xpForNextLevel) * 100));
 
   const availableSkins = [
-    { id: 'boy_default', character: 'boy', skin: 'default', label: 'Trainer Boy', unlocked: true },
-    { id: 'girl_default', character: 'girl', skin: 'default', label: 'Trainer Girl', unlocked: player.rewards.includes('girl') },
-    { id: 'boy_champion', character: 'boy', skin: 'champion', label: 'Champion Boy', unlocked: player.rewards.includes('boy_champion') },
-    { id: 'girl_champion', character: 'girl', skin: 'champion', label: 'Champion Girl', unlocked: player.rewards.includes('girl_champion') },
+    { id: 'boy_default', character: 'boy', skin: 'default', label: 'Rookie Agent', unlocked: true },
+    { id: 'girl_default', character: 'girl', skin: 'default', label: 'Associate Producer', unlocked: player.rewards.includes('girl') },
+    { id: 'boy_champion', character: 'boy', skin: 'champion', label: 'Senior Producer', unlocked: player.rewards.includes('boy_champion') },
+    { id: 'girl_champion', character: 'girl', skin: 'champion', label: 'Guild Elite', unlocked: player.rewards.includes('girl_champion') },
   ];
 
   return (
     <div className="panel hero-panel">
-      <h2 className="panel-title panel-title--blue">Agent Card</h2>
+      <h2 className="panel-title panel-title--blue">Guild Agent Card</h2>
 
       <div className="agent-header">
         <img
@@ -50,7 +50,7 @@ const Character = ({ player, onCustomize }) => {
       </div>
 
       <div className="customize-section">
-        <h4 className="section-label">Change Appearance</h4>
+        <h4 className="section-label">Guild Rank Appearance</h4>
         <div className="customization-grid">
           {availableSkins.map((skin) => {
             const isSelected = player.character === skin.character && player.skin === skin.skin;

@@ -7,7 +7,7 @@ const BADGE_DEFS = [
 const Badges = ({ stats, badges }) => {
   return (
     <div className="panel hero-panel badges-panel">
-      <h3 className="panel-title panel-title--red">Achievements</h3>
+      <h3 className="panel-title panel-title--red">Guild Medals</h3>
 
       <div className="badge-grid">
         {BADGE_DEFS.map((b) => {
