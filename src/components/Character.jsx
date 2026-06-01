@@ -6,7 +6,7 @@ function getXpForNextLevel(level) {
 }
 
 function avatarSrc(character, skin) {
-  return `/avatars/${character}_${skin}.svg`;
+  return `/avatars/${character}_${skin}.png`;
 }
 
 const Character = ({ player, onCustomize }) => {
