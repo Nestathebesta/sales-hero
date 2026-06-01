@@ -1,0 +1,144 @@
+import { useEffect, useState } from 'react';
+import { Swords, Zap } from 'lucide-react';
+import Character from './components/Character';
+import LeadList from './components/LeadList';
+import Inventory from './components/Inventory';
+import BattleLog from './components/BattleLog';
+import Badges from './components/Badges';
+import { fetchState, customizePlayer } from './api';
+
+function App() {
+  const [gameState, setGameState] = useState(null);
+  const [activeTab, setActiveTab] = useState('leads');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const loadState = async () => {
+    try {
+      const state = await fetchState();
+      setGameState(state);
+      setError(null);
+    } catch (err) {
+      console.error('Failed to load game state:', err);
+      setError('Cannot reach GameMaster server. Start the backend on port 3001.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch game state on mount
+    void loadState();
+    const interval = setInterval(loadState, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleCustomize = async (character, skin) => {
+    try {
+      await customizePlayer(character, skin);
+      loadState();
+    } catch (err) {
+      console.error('Failed to customize player:', err);
+    }
+  };
+
+  const player = gameState?.player;
+  const leadCount = gameState ? Object.keys(gameState.leads).length : 0;
+
+  return (
+    <div className="app-container">
+      <header className="header">
+        <div className="header-badge">P&amp;C Insurance Edition</div>
+        <h1>SalesDex</h1>
+        <p className="header-tagline">Gotta close &apos;em all!</p>
+      </header>
+
+      {player && (
+        <div className="hud-bar">
+          <div className="hud-stat">
+            <span className="hud-label">Agent</span>
+            <span className="hud-value">{player.name}</span>
+          </div>
+          <div className="hud-stat">
+            <span className="hud-label">Level</span>
+            <span className="hud-value hud-highlight">{player.level}</span>
+          </div>
+          <div className="hud-stat">
+            <span className="hud-label">Total EXP</span>
+            <span className="hud-value">{player.totalXP}</span>
+          </div>
+          <div className="hud-stat">
+            <span className="hud-label">Encounters</span>
+            <span className="hud-value">{leadCount}</span>
+          </div>
+          <div className="hud-stat">
+            <span className="hud-label">Badges</span>
+            <span className="hud-value">{player.badges?.length ?? 0}/3</span>
+          </div>
+        </div>
+      )}
+
+      {loading && (
+        <div className="loading-panel">
+          <div className="loading-spinner" aria-hidden="true" />
+          <p>Loading your adventure...</p>
+        </div>
+      )}
+
+      {error && !loading && (
+        <div className="error-panel" role="alert">
+          <p>{error}</p>
+          <button type="button" className="game-btn game-btn--blue" onClick={loadState}>
+            Retry Connection
+          </button>
+        </div>
+      )}
+
+      {gameState && (
+        <div className="battle-log-row">
+          <BattleLog events={gameState.globalEvents} />
+        </div>
+      )}
+
+      <aside className="sidebar">
+        {gameState && (
+          <>
+            <Character player={gameState.player} onCustomize={handleCustomize} />
+            <Badges stats={gameState.player.stats} badges={gameState.player.badges} />
+          </>
+        )}
+      </aside>
+
+      <main className="main-content">
+        <nav className="feature-tabs" aria-label="Main sections">
+          <button
+            type="button"
+            className={`tab-btn ${activeTab === 'leads' ? 'active' : ''}`}
+            onClick={() => setActiveTab('leads')}
+          >
+            <Swords size={14} aria-hidden="true" />
+            Encounters
+          </button>
+          <button
+            type="button"
+            className={`tab-btn ${activeTab === 'bag' ? 'active' : ''}`}
+            onClick={() => setActiveTab('bag')}
+          >
+            <Zap size={14} aria-hidden="true" />
+            Action Lab
+          </button>
+        </nav>
+
+        {gameState && activeTab === 'leads' && (
+          <LeadList leads={gameState.leads} />
+        )}
+
+        {gameState && activeTab === 'bag' && (
+          <Inventory leads={gameState.leads} onTrigger={loadState} />
+        )}
+      </main>
+    </div>
+  );
+}
+
+export default App;

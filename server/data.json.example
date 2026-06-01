@@ -1,0 +1,18 @@
+{
+  "player": {
+    "name": "Ash",
+    "character": "boy",
+    "skin": "default",
+    "totalXP": 0,
+    "level": 1,
+    "rewards": [],
+    "badges": [],
+    "stats": {
+      "calls": 0,
+      "quotes": 0,
+      "policies": 0
+    }
+  },
+  "leads": {},
+  "globalEvents": ["Welcome to SalesDex! Head to Action Lab and trigger your first encounter."]
+}
