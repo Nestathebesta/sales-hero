@@ -1,14 +1,14 @@
-# SalesDex — Product Requirements Document
+﻿# SalesDex â€” Product Requirements Document
 
 **Version:** 1.0  
 **Last updated:** June 1, 2026  
-**Status:** MVP in development
+**Status:** MVP polish complete; GitHub/Vercel launch pending auth
 
 ---
 
 ## 1. Vision & Summary
 
-**SalesDex** (repo: `sales-hero`) is a gamified sales progression system for Property & Casualty (P&C) insurance agents. It wraps everyday CRM activity—calls, quotes, and closed policies—in a retro RPG experience inspired by classic monster-collection games.
+**SalesDex** (repo: `sales-hero`) is a gamified sales progression system for Property & Casualty (P&C) insurance agents. It wraps everyday CRM activityâ€”calls, quotes, and closed policiesâ€”in a retro RPG experience inspired by classic monster-collection games.
 
 **Tagline:** *Gotta close 'em all!*
 
@@ -45,7 +45,7 @@ Agents see their level, XP bar, unlockable avatars, gym-style badges, and a typi
 | Sent quote | `insurance/quote` | 30 |
 | Closed policy | `insurance/closed_policy` | 100 |
 
-**Agent level thresholds** (total XP): 100 → L2, 500 → L3, 1,000 → L4, 5,000 → L5, 10,000 → L6.
+**Agent level thresholds** (total XP): 100 â†’ L2, 500 â†’ L3, 1,000 â†’ L4, 5,000 â†’ L5, 10,000 â†’ L6.
 
 **Lead levels** use the same curve on per-lead XP.
 
@@ -67,7 +67,7 @@ Agents see their level, XP bar, unlockable avatars, gym-style badges, and a typi
 
 ### 3.4 Battle Log
 
-The five most recent global events display in a typewriter-style dialogue box—level-ups, new prospects, badge earns, and action summaries.
+The five most recent global events display in a typewriter-style dialogue boxâ€”level-ups, new prospects, badge earns, and action summaries.
 
 ### 3.5 Encounters (Leads)
 
@@ -75,21 +75,21 @@ Each webhook creates or updates a lead with privacy-safe names (e.g. "Jane D.").
 
 ---
 
-## 4. Features — MVP vs Future
+## 4. Features â€” MVP vs Future
 
 ### MVP (current + near-term polish)
 
 | Priority | Feature | Status |
 |----------|---------|--------|
-| P0 | Webhook ingestion + XP calculation | ✅ Shipped |
-| P0 | Agent card (level, XP bar, skins) | ✅ Shipped |
-| P0 | Encounters list | ✅ Shipped |
-| P0 | Battle log | ✅ Shipped |
-| P0 | Badge + career stats | ✅ Shipped |
-| P0 | Zapier Event Simulator (manual triggers) | ✅ Shipped |
-| P1 | Responsive game-style UI polish | 🔄 In progress |
-| P1 | Env-based API URL for deployment | 🔄 In progress |
-| P1 | README + Vercel deploy docs | 🔄 In progress |
+| P0 | Webhook ingestion + XP calculation | âœ… Shipped |
+| P0 | Agent card (level, XP bar, skins) | âœ… Shipped |
+| P0 | Encounters list | âœ… Shipped |
+| P0 | Battle log | âœ… Shipped |
+| P0 | Badge + career stats | âœ… Shipped |
+| P0 | Zapier Event Simulator (manual triggers) | âœ… Shipped |
+| P1 | Responsive game-style UI polish | Done (June 2026) |
+| P1 | Env-based API URL for deployment | Done (`VITE_API_URL`) |
+| P1 | README + Vercel deploy docs | Done |
 
 ### Future (post-MVP)
 
@@ -131,9 +131,9 @@ Each webhook creates or updates a lead with privacy-safe names (e.g. "Jane D.").
 | Metric | Target (90 days post-launch) | Measurement |
 |--------|------------------------------|-------------|
 | Daily active agents | 10+ on pilot team | Unique webhook `player.name` or auth ID |
-| Events per agent per day | ≥ 5 | Webhook volume |
+| Events per agent per day | â‰¥ 5 | Webhook volume |
 | Badge earn rate | 50% earn Closer Badge in first week | `player.badges` |
-| Simulator → live Zapier conversion | 30% of demo users connect a Zap | Integration flag |
+| Simulator â†’ live Zapier conversion | 30% of demo users connect a Zap | Integration flag |
 | Session engagement | Avg. 3+ page loads per session | Frontend analytics |
 | Level-up retention | 70% return within 48h of first level-up | Cohort analysis |
 
@@ -143,13 +143,13 @@ Each webhook creates or updates a lead with privacy-safe names (e.g. "Jane D.").
 
 | Constraint | Detail |
 |------------|--------|
-| **Stack** | Vite + React (frontend), Express (backend)—no Next.js today |
-| **Persistence** | File-based `server/data.json`—not suitable for multi-instance serverless without external storage |
-| **Deployment split** | Frontend → Vercel static; Backend → Node host (Railway, Render, Fly.io) or future serverless refactor |
-| **CORS** | Backend allows all origins today—tighten for production |
+| **Stack** | Vite + React (frontend), Express (backend)â€”no Next.js today |
+| **Persistence** | File-based `server/data.json`â€”not suitable for multi-instance serverless without external storage |
+| **Deployment split** | Frontend â†’ Vercel static; Backend â†’ Node host (Railway, Render, Fly.io) or future serverless refactor |
+| **CORS** | Backend allows all origins todayâ€”tighten for production |
 | **Secrets** | No API keys in repo; use `VITE_API_URL` and `PORT` env vars |
 | **Privacy** | Lead names stored as first name + last initial only |
-| **Polling** | Frontend refreshes state every 5s—consider WebSockets later |
+| **Polling** | Frontend refreshes state every 5sâ€”consider WebSockets later |
 
 ---
 
@@ -159,26 +159,26 @@ Assuming start **June 1, 2026** (today).
 
 | Phase | Dates | Deliverables |
 |-------|-------|--------------|
-| **Sprint 0 — Foundation** | Jun 1–7, 2026 | PRD, git repo, README, UI polish, env config, Vercel frontend deploy |
-| **Sprint 1 — Production API** | Jun 8–21, 2026 | Deploy Express backend, `VITE_API_URL` in prod, CORS lockdown, sample Zapier Zap |
-| **Sprint 2 — Engagement** | Jun 22 – Jul 5, 2026 | Level-up toasts, badge progress bars, sound toggle |
-| **Sprint 3 — Team features** | Jul 6–19, 2026 | Leaderboard MVP, Postgres migration spike |
-| **Sprint 4 — Pilot** | Jul 20 – Aug 2, 2026 | 5–10 agent pilot, metrics dashboard, feedback loop |
+| **Sprint 0 â€” Foundation** | Jun 1â€“7, 2026 | PRD, git repo, README, UI polish, env config, Vercel frontend deploy |
+| **Sprint 1 â€” Production API** | Jun 8â€“21, 2026 | Deploy Express backend, `VITE_API_URL` in prod, CORS lockdown, sample Zapier Zap |
+| **Sprint 2 â€” Engagement** | Jun 22 â€“ Jul 5, 2026 | Level-up toasts, badge progress bars, sound toggle |
+| **Sprint 3 â€” Team features** | Jul 6â€“19, 2026 | Leaderboard MVP, Postgres migration spike |
+| **Sprint 4 â€” Pilot** | Jul 20 â€“ Aug 2, 2026 | 5â€“10 agent pilot, metrics dashboard, feedback loop |
 
 ---
 
-## 9. Appendix — Current Architecture
+## 9. Appendix â€” Current Architecture
 
 ```
-┌─────────────────┐     POST /webhook      ┌──────────────────┐
-│  Zapier / Mock  │ ─────────────────────► │  Express Server  │
-│  Event Simulator│                        │  (port 3001)     │
-└─────────────────┘                        │  xpCalculator.js │
-                                           │  state.js        │
-┌─────────────────┐     GET /state         └────────┬─────────┘
-│  React App      │ ◄───────────────────────────────┘
-│  (Vite :5173)   │     POST /player/customize
-└─────────────────┘
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”     POST /webhook      â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚  Zapier / Mock  â”‚ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–º â”‚  Express Server  â”‚
+â”‚  Event Simulatorâ”‚                        â”‚  (port 3001)     â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜                        â”‚  xpCalculator.js â”‚
+                                           â”‚  state.js        â”‚
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”     GET /state         â””â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+â”‚  React App      â”‚ â—„â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+â”‚  (Vite :5173)   â”‚     POST /player/customize
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 ```
 
 **Key files:** `src/App.jsx`, `server/index.js`, `server/xpCalculator.js`, `server/state.js`
