@@ -1,5 +1,6 @@
 import {
   APPEARANCE_OPTIONS,
+  appearanceTint,
   unlockLevelForReward,
   xpProgressInLevel,
 } from '../../shared/xp.js';
@@ -9,6 +10,7 @@ const Character = ({ player, onCustomize }) => {
   if (!player) return null;
 
   const { current, needed, percent } = xpProgressInLevel(player.totalXP, player.level);
+  const heroTint = appearanceTint(player);
 
   return (
     <div className="panel hero-panel crusader-card">
@@ -16,7 +18,7 @@ const Character = ({ player, onCustomize }) => {
 
       <div className="agent-header">
         <div className="avatar-frame avatar-frame--sprite">
-          <CrusaderSprite className="agent-portrait-sprite" size={132} />
+          <CrusaderSprite className="agent-portrait-sprite" size={132} tint={heroTint} />
         </div>
         <div>
           <h3 className="agent-name">{player.name}</h3>

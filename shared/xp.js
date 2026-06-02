@@ -58,12 +58,24 @@ export function unlockLevelForReward(rewardKey) {
   return rank?.minLevel ?? 99;
 }
 
+// `tint` recolors the animated hero sprite to match the chosen rank (null = the
+// sprite's natural colours). Mirrors the rank-token palette.
 export const APPEARANCE_OPTIONS = [
-  { id: 'boy_default', character: 'boy', skin: 'default', label: 'Squire', rewardKey: null, art: '/avatars/rank-squire.png' },
-  { id: 'girl_default', character: 'girl', skin: 'default', label: 'Knight Errant', rewardKey: 'girl', art: '/avatars/rank-knight.png' },
-  { id: 'boy_champion', character: 'boy', skin: 'champion', label: 'Crusader', rewardKey: 'boy_champion', art: '/avatars/rank-crusader.png' },
-  { id: 'girl_champion', character: 'girl', skin: 'champion', label: 'Commander', rewardKey: 'girl_champion', art: '/avatars/rank-commander.png' },
+  { id: 'boy_default', character: 'boy', skin: 'default', label: 'Squire', rewardKey: null, art: '/avatars/rank-squire.png', tint: null },
+  { id: 'girl_default', character: 'girl', skin: 'default', label: 'Knight Errant', rewardKey: 'girl', art: '/avatars/rank-knight.png', tint: '#5b8af0' },
+  { id: 'boy_champion', character: 'boy', skin: 'champion', label: 'Crusader', rewardKey: 'boy_champion', art: '/avatars/rank-crusader.png', tint: '#e3c45a' },
+  { id: 'girl_champion', character: 'girl', skin: 'champion', label: 'Commander', rewardKey: 'girl_champion', art: '/avatars/rank-commander.png', tint: '#e0566a' },
 ];
+
+/** Resolve the active appearance tint for a player (null if locked/unknown). */
+export function appearanceTint(player) {
+  const opt = APPEARANCE_OPTIONS.find(
+    (o) => o.character === player.character && o.skin === player.skin
+  );
+  if (!opt) return null;
+  const unlocked = !opt.rewardKey || (player.rewards || []).includes(opt.rewardKey);
+  return unlocked ? opt.tint : null;
+}
 
 /**
  * Tiered campaign medals. Awarded server-side (see server/medals.js — keep in
