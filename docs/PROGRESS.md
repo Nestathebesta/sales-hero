@@ -83,7 +83,25 @@ All **P0** features were already shipped. **P1** items were verified complete in
 | 4 | War Room performance dashboard + inline SVG charts | **Done** (June 2026) |
 | 5 | Pipeline stage board, level-up UX, expanded medals | **Done** (June 2026) |
 | 5b | War Council AI (Vercel AI Gateway), snappiness audit fixes, asset trim | **Done** (June 2026) |
-| 6 | Backend deploy (serverless) + Supabase persistence + more AI | Pending |
+| 6 | Supabase persistence + Vercel serverless restructure | **Code done** — needs env vars on Vercel to go live (June 2026) |
+| 7 | More AI features (next-best-action, daily recap) | Pending |
+
+### Sprint 6 — persistence + serverless (June 2026)
+
+- **Persistence** — game state now lives in Supabase (`game_state` jsonb singleton row,
+  project `qwzvfubrckahuzdttvis`). `server/db.js` uses Supabase when `SUPABASE_URL` +
+  `SUPABASE_SERVICE_ROLE_KEY` are set, else falls back to `server/data.json` for local dev.
+  `state.js` is async (load-once / save-once; also fixes the per-event I/O amplification).
+- **Serverless** — the Express app moved to `server/app.js` (routes under `/api`).
+  `server/index.js` runs it locally; `api/index.js` exports it as a Vercel function.
+  Frontend calls same-origin `/api` (Vite proxies in dev; `vercel.json` rewrites `/api/*`
+  to the function in prod).
+- **Required env vars on Vercel** (Project → Settings → Environment Variables) before the
+  deploy is functional — the serverless filesystem is read-only, so Supabase is mandatory:
+  - `SUPABASE_URL=https://qwzvfubrckahuzdttvis.supabase.co`
+  - `SUPABASE_SERVICE_ROLE_KEY=<from Supabase dashboard → Project Settings → API>` (SECRET)
+  - `AI_GATEWAY_API_KEY=<Vercel AI Gateway key>` (optional; War Council falls back without it)
+  - Leave `VITE_API_URL` unset (defaults to same-origin `/api`).
 
 ### Sprint 2c–4 notes (June 2026)
 

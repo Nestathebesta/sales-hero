@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+// Same-origin /api by default: in dev, Vite proxies /api -> the local API server;
+// in prod, Vercel rewrites /api/* to the serverless function. Override with
+// VITE_API_URL only if the API lives on a different origin.
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 export const fetchState = async () => {
   const response = await axios.get(`${API_URL}/state`);

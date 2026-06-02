@@ -1,60 +1,11 @@
 /**
- * index.js (Backend Entry Point)
- * 
- * Express server that acts as the "GameMaster" for LeadHero.
- * Exposes a /webhook route to receive events from Zapier.
- * Exposes /state and /player/customize routes for the React frontend.
+ * Local entry point — starts the GameMaster API for development.
+ * (In production the same app is served as a Vercel serverless function; see
+ *  api/index.js.) Routes are defined in server/app.js under /api.
  */
-const express = require('express');
-const cors = require('cors');
-const { processEvent } = require('./xpCalculator');
-const { readState, updatePlayer } = require('./state');
-const { generateBriefing } = require('./ai');
-
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-// Zapier Webhook Endpoint
-app.post('/webhook', (req, res) => {
-  const { leadId, eventType, contactInfo } = req.body;
-  if (!leadId || !eventType) {
-    return res.status(400).json({ error: 'Missing leadId or eventType' });
-  }
-
-  const result = processEvent(leadId, eventType, contactInfo);
-  res.json({ success: true, ...result });
-});
-
-app.get('/state', (req, res) => {
-  const state = readState();
-  res.json(state);
-});
-
-// War Council — AI coaching briefing (key stays server-side; falls back gracefully)
-app.get('/ai/briefing', async (req, res) => {
-  try {
-    const result = await generateBriefing();
-    res.json(result);
-  } catch (err) {
-    console.error('Briefing failed:', err.message);
-    res.status(500).json({ error: 'Briefing unavailable' });
-  }
-});
-
-// Endpoint to customize character
-app.post('/player/customize', (req, res) => {
-  const { character, skin } = req.body;
-  const player = readState().player;
-  
-  player.character = character || player.character;
-  player.skin = skin || player.skin;
-  
-  updatePlayer(player);
-  res.json({ success: true, player });
-});
+const app = require('./app');
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-  console.log(`SalesDex GameMaster API running on port ${PORT}`);
+  console.log(`SalesDex GameMaster API running on http://localhost:${PORT} (routes under /api)`);
 });

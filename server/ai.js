@@ -55,7 +55,7 @@ function fallbackAdvice(c) {
 }
 
 async function generateBriefing() {
-  const state = readState();
+  const state = await readState();
   const c = summarize(state);
   const key = process.env.AI_GATEWAY_API_KEY;
 
