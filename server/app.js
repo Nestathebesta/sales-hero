@@ -12,7 +12,7 @@ const express = require('express');
 const cors = require('cors');
 const { processEvent } = require('./xpCalculator');
 const { readState, writeState } = require('./state');
-const { generateBriefing } = require('./ai');
+const { generateBriefing, generateNextAction, generateDailyRecap } = require('./ai');
 const { classifyEventTitle, deriveEntity, slug } = require('./classify');
 
 const app = express();
@@ -93,6 +93,30 @@ app.get('/api/ai/briefing', async (req, res) => {
   } catch (err) {
     console.error('Briefing failed:', err.message);
     res.status(500).json({ error: 'Briefing unavailable' });
+  }
+});
+
+// AI next-best-action for a single prospect
+app.get('/api/ai/next-action', async (req, res) => {
+  try {
+    const leadId = req.query.leadId;
+    if (!leadId) return res.status(400).json({ error: 'Missing leadId' });
+    const result = await generateNextAction(leadId);
+    res.json(result);
+  } catch (err) {
+    console.error('Next-action failed:', err.message);
+    res.status(500).json({ error: 'Advice unavailable' });
+  }
+});
+
+// AI end-of-day recap
+app.get('/api/ai/recap', async (req, res) => {
+  try {
+    const result = await generateDailyRecap();
+    res.json(result);
+  } catch (err) {
+    console.error('Recap failed:', err.message);
+    res.status(500).json({ error: 'Recap unavailable' });
   }
 });
 

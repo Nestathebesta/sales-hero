@@ -1,7 +1,8 @@
-import { useMemo } from 'react';
-import { Car, Home, Umbrella, Building2, Heart, ScrollText } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Car, Home, Umbrella, Building2, Heart, ScrollText, Lightbulb } from 'lucide-react';
 import { xpProgressInLevel } from '../../shared/xp.js';
 import { STAGES, STAGE_META, groupByStage } from '../lib/insights.js';
+import { fetchNextAction } from '../api';
 
 const PRODUCT_META = {
   auto: { Icon: Car, tone: 'blue' },
@@ -24,6 +25,18 @@ function productMeta(lead) {
 function LeadCard({ lead }) {
   const { percent } = xpProgressInLevel(lead.xp, lead.level);
   const { Icon, tone } = productMeta(lead);
+  const [advice, setAdvice] = useState(null); // null | 'loading' | { text, source }
+
+  const advise = async () => {
+    setAdvice('loading');
+    try {
+      const r = await fetchNextAction(lead.id);
+      setAdvice({ text: r.advice, source: r.source });
+    } catch {
+      setAdvice({ text: 'War Council unreachable — is the API running?', source: 'error' });
+    }
+  };
+
   return (
     <div className="lead-item">
       <div className={`lead-avatar lead-avatar--${tone}`} aria-hidden="true">
@@ -42,6 +55,13 @@ function LeadCard({ lead }) {
       <div className="lead-meta">
         <div className="lead-number">{lead.id.replace('_', '-').toUpperCase()}</div>
         <div>{lead.events.length} action{lead.events.length !== 1 ? 's' : ''}</div>
+      </div>
+      <div className="lead-advise-row">
+        <button type="button" className="lead-advise" onClick={advise} disabled={advice === 'loading'}>
+          <Lightbulb size={12} aria-hidden="true" />
+          {advice === 'loading' ? 'Consulting…' : 'Next move'}
+        </button>
+        {advice && advice !== 'loading' && <p className="lead-advice">{advice.text}</p>}
       </div>
     </div>
   );

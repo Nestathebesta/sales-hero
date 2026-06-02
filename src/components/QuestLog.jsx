@@ -1,6 +1,36 @@
-import { useMemo } from 'react';
-import { Phone, FileText, Trophy, ScrollText } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Phone, FileText, Trophy, ScrollText, Sparkles } from 'lucide-react';
 import { EVENT_TYPES, dateKey, flattenEvents, relativeTime } from '../lib/insights.js';
+import { fetchRecap } from '../api';
+
+function DailyRecap() {
+  const [recap, setRecap] = useState(null); // null | 'loading' | { text, source }
+
+  const run = async () => {
+    setRecap('loading');
+    try {
+      const r = await fetchRecap();
+      setRecap({ text: r.advice, source: r.source });
+    } catch {
+      setRecap({ text: 'War Council unreachable — is the API running?', source: 'error' });
+    }
+  };
+
+  return (
+    <div className="recap">
+      <button type="button" className="recap-btn" onClick={run} disabled={recap === 'loading'}>
+        <Sparkles size={14} aria-hidden="true" />
+        {recap === 'loading' ? 'Summoning…' : recap ? "Recap today's deeds again" : "Recap today's deeds"}
+      </button>
+      {recap && recap !== 'loading' && (
+        <p className="recap-text">
+          {recap.text}
+          {recap.source === 'fallback' && <span className="recap-note"> · offline counsel (add AI key for live)</span>}
+        </p>
+      )}
+    </div>
+  );
+}
 
 const KIND_ICON = { call: Phone, quote: FileText, close: Trophy };
 
@@ -51,6 +81,8 @@ const QuestLog = ({ leads }) => {
       <p className="panel-subtitle">
         {events.length} deed{events.length !== 1 ? 's' : ''} · {totalXP} EXP earned in the field
       </p>
+
+      <DailyRecap />
 
       <div className="quest-log">
         {groups.map((group) => (
