@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Car, Home, Umbrella, Building2, Heart, ScrollText } from 'lucide-react';
 import { xpProgressInLevel } from '../../shared/xp.js';
 import { STAGES, STAGE_META, groupByStage } from '../lib/insights.js';
@@ -48,6 +49,7 @@ function LeadCard({ lead }) {
 
 const LeadList = ({ leads }) => {
   const leadArray = Object.values(leads || {});
+  const groups = useMemo(() => groupByStage(leads), [leads]);
 
   if (leadArray.length === 0) {
     return (
@@ -59,7 +61,6 @@ const LeadList = ({ leads }) => {
     );
   }
 
-  const groups = groupByStage(leads);
   const closed = groups.Closed.length;
 
   return (

@@ -1,4 +1,6 @@
+import { useMemo } from 'react';
 import { flattenEvents, funnel, xpSeries } from '../lib/insights.js';
+import AiBriefing from './AiBriefing';
 
 const FUNNEL_ROWS = [
   { key: 'calls', label: 'Calls', tone: 'blue' },
@@ -39,8 +41,7 @@ function XpLineChart({ series }) {
 
 const StatsDashboard = ({ player, leads }) => {
   const stats = player?.stats ?? {};
-  const events = flattenEvents(leads);
-  const series = xpSeries(events, 14);
+  const series = useMemo(() => xpSeries(flattenEvents(leads), 14), [leads]);
   const f = funnel(stats);
   const maxFunnel = Math.max(1, f.calls, f.quotes, f.policies);
 
@@ -55,6 +56,8 @@ const StatsDashboard = ({ player, leads }) => {
     <div className="panel pipeline-panel">
       <h2 className="panel-title panel-title--blue">War Room</h2>
       <p className="panel-subtitle">Performance intel for your crusade.</p>
+
+      <AiBriefing />
 
       <div className="kpi-grid">
         {kpis.map((k) => (

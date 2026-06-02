@@ -9,6 +9,8 @@ const ActivityFeed = ({ events }) => {
       : 'Welcome to the Sales Crusade! Open Action Lab and log your first pipeline activity.';
 
   useEffect(() => {
+    // Note: App pauses polling while the tab is hidden, so latestEvent never
+    // changes in the background and this typewriter only runs while visible.
     let i = 0;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- reset typewriter on new event
     setDisplayText('');

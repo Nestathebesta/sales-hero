@@ -20,3 +20,8 @@ export const triggerWebhook = async (leadId, eventType, contactInfo = {}) => {
   });
   return response.data;
 };
+
+export const fetchBriefing = async () => {
+  const response = await axios.get(`${API_URL}/ai/briefing`);
+  return response.data;
+};

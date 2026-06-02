@@ -27,10 +27,18 @@ function App() {
   const [levelUpNotice, setLevelUpNotice] = useState(null);
   const prevLevelRef = useRef(null);
   const prevPoliciesRef = useRef(null);
+  const lastSigRef = useRef(null);
 
   const loadState = async () => {
     try {
       const state = await fetchState();
+
+      // Skip the whole re-render when nothing changed since the last poll —
+      // this is the common case and keeps the dashboard idle-cheap.
+      const signature = JSON.stringify(state);
+      if (signature === lastSigRef.current) return;
+      lastSigRef.current = signature;
+
       const nextLevel = state.player?.level;
       if (
         prevLevelRef.current !== null &&
@@ -64,10 +72,25 @@ function App() {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch game state on mount
-    void loadState();
-    const interval = setInterval(loadState, 5000);
-    return () => clearInterval(interval);
+    let interval = null;
+    const start = () => {
+      if (interval) return;
+      void loadState();
+      interval = setInterval(loadState, 5000);
+    };
+    const stop = () => {
+      if (interval) clearInterval(interval);
+      interval = null;
+    };
+    // Pause polling while the tab is hidden; refresh immediately on return.
+    const onVisibility = () => (document.hidden ? stop() : start());
+
+    start();
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      stop();
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
   }, []);
 
   const handleCustomize = async (character, skin) => {

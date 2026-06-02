@@ -41,9 +41,8 @@ const Inventory = ({ leads, onTrigger }) => {
     try {
       await triggerWebhook(selectedLead, eventType, { firstName: 'Jane', lastName: 'Doe' });
       salesState.recordEvent(eventType);
-      if (eventType === 'insurance/closed_policy') {
-        salesState.triggerClosedDeal();
-      }
+      // The closed-deal attack is fired once by App's poll-diff (which refreshes
+      // immediately via onTrigger) — avoids a double-trigger / double animation.
       onTrigger();
     } catch (err) {
       console.error(err);

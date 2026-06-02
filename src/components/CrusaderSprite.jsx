@@ -58,7 +58,7 @@ const CrusaderSprite = ({ className = '', size = DISPLAY_SIZE }) => {
     const renderSize = DISPLAY_FRAME_SIZE;
 
     const tick = (ts) => {
-      if (!running) return;
+      if (!running || document.hidden) return; // stop burning frames on a hidden tab
 
       const sheet = sheetRef.current;
       const anim = animRef.current;
@@ -105,16 +105,26 @@ const CrusaderSprite = ({ className = '', size = DISPLAY_SIZE }) => {
     img.onload = () => {
       sheetRef.current = img;
       animRef.current.lastTs = 0;
-      rafRef.current = requestAnimationFrame(tick);
+      if (!document.hidden) rafRef.current = requestAnimationFrame(tick);
     };
 
     img.onerror = () => {
       console.error('CrusaderSprite: failed to load', CRUSADER_SPRITE_SHEET);
     };
 
+    // Resume the loop when the tab becomes visible again (reset dt to avoid a jump).
+    const onVisibility = () => {
+      if (!running || document.hidden || !sheetRef.current) return;
+      animRef.current.lastTs = 0;
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+
     return () => {
       running = false;
       cancelAnimationFrame(rafRef.current);
+      document.removeEventListener('visibilitychange', onVisibility);
       sheetRef.current = null;
     };
   }, []);

@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Flame, Check } from 'lucide-react';
 import {
   DAILY_GOALS,
@@ -14,10 +15,10 @@ const GOAL_ROWS = [
 ];
 
 const DailyGoals = ({ leads }) => {
-  const events = flattenEvents(leads);
-  const daily = dailyCounts(events);
-  const today = todayCounts(daily);
-  const streak = computeStreak(daily);
+  const { today, streak } = useMemo(() => {
+    const daily = dailyCounts(flattenEvents(leads));
+    return { today: todayCounts(daily), streak: computeStreak(daily) };
+  }, [leads]);
 
   const metCount = GOAL_ROWS.filter((r) => today[r.key] >= r.goal).length;
   const allMet = metCount === GOAL_ROWS.length;
