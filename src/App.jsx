@@ -7,6 +7,7 @@ import ActivityFeed from './components/ActivityFeed';
 import Badges from './components/Badges';
 import LevelUpToast from './components/LevelUpToast';
 import { fetchState, customizePlayer } from './api';
+import { salesState } from './state/stateManager';
 
 function App() {
   const [gameState, setGameState] = useState(null);
@@ -15,6 +16,7 @@ function App() {
   const [error, setError] = useState(null);
   const [levelUpNotice, setLevelUpNotice] = useState(null);
   const prevLevelRef = useRef(null);
+  const prevPoliciesRef = useRef(null);
 
   const loadState = async () => {
     try {
@@ -31,6 +33,15 @@ function App() {
         });
       }
       if (nextLevel != null) prevLevelRef.current = nextLevel;
+
+      const policies = state.player?.stats?.policies ?? 0;
+      if (
+        prevPoliciesRef.current !== null &&
+        policies > prevPoliciesRef.current
+      ) {
+        salesState.triggerClosedDeal();
+      }
+      prevPoliciesRef.current = policies;
 
       setGameState(state);
       setError(null);

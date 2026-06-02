@@ -3,9 +3,13 @@ import {
   unlockLevelForReward,
   xpProgressInLevel,
 } from '../../shared/xp.js';
+import CrusaderSprite from './CrusaderSprite';
 
 function avatarSrc(character, skin) {
-  return `/avatars/${character}_${skin}.svg`;
+  const raceMap = { boy: 'human', girl: 'human' };
+  const race = raceMap[character] ?? character;
+  const skinKey = skin === 'champion' ? 'dark_knight' : 'default';
+  return `/avatars/${race}_${skinKey}.png`;
 }
 
 const Character = ({ player, onCustomize }) => {
@@ -18,12 +22,8 @@ const Character = ({ player, onCustomize }) => {
       <h2 className="panel-title panel-title--gold">Crusader Card</h2>
 
       <div className="agent-header">
-        <div className="avatar-frame">
-          <img
-            className="agent-portrait"
-            src={avatarSrc(player.character, player.skin)}
-            alt={`${player.title} avatar`}
-          />
+        <div className="avatar-frame avatar-frame--sprite">
+          <CrusaderSprite className="agent-portrait-sprite" scale={2} />
         </div>
         <div>
           <h3 className="agent-name">{player.name}</h3>

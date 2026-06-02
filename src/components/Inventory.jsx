@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Phone, FileText, Trophy } from 'lucide-react';
 import { triggerWebhook } from '../api';
+import { salesState } from '../state/stateManager';
 
 const ACTIONS = [
   {
@@ -39,6 +40,10 @@ const Inventory = ({ leads, onTrigger }) => {
     setBusy(true);
     try {
       await triggerWebhook(selectedLead, eventType, { firstName: 'Jane', lastName: 'Doe' });
+      salesState.recordEvent(eventType);
+      if (eventType === 'insurance/closed_policy') {
+        salesState.triggerClosedDeal();
+      }
       onTrigger();
     } catch (err) {
       console.error(err);
