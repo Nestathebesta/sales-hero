@@ -1,100 +1,60 @@
-const fs = require('fs');
-const path = require('path');
-const { syncPlayerProgression } = require('./xpEngine');
-
-const DATA_FILE = path.join(__dirname, 'data.json');
+const { loadRaw, saveRaw } = require('./db');
+const { syncPlayerProgression, calculateLevel } = require('./xpEngine');
 
 const defaultState = {
   player: {
-    name: "Nesta",
-    character: "boy",
-    skin: "default",
+    name: 'Nesta',
+    character: 'boy',
+    skin: 'default',
     totalXP: 0,
     level: 1,
-    title: "Squire",
+    title: 'Squire',
     rewards: [],
     badges: [],
-    stats: {
-      calls: 0,
-      quotes: 0,
-      policies: 0
-    }
+    stats: { calls: 0, quotes: 0, policies: 0 },
   },
   leads: {},
-  globalEvents: ["Welcome to the Sales Crusade! Open Action Lab and log your first pipeline activity."]
+  globalEvents: ['Welcome to the Sales Crusade! Open Action Lab and log your first pipeline activity.'],
 };
 
-function normalizePlayer(player) {
-  return syncPlayerProgression({
+/** Re-derive computed fields (player level/title/rewards, lead levels). */
+function normalize(state) {
+  const s = state && typeof state === 'object' ? state : {};
+  s.globalEvents = Array.isArray(s.globalEvents) ? s.globalEvents : defaultState.globalEvents.slice();
+  s.leads = s.leads && typeof s.leads === 'object' ? s.leads : {};
+  s.player = syncPlayerProgression({
     ...defaultState.player,
-    ...player,
-    stats: { ...defaultState.player.stats, ...player.stats },
-    badges: player.badges ?? [],
-    rewards: player.rewards ?? [],
+    ...(s.player || {}),
+    stats: { ...defaultState.player.stats, ...(s.player?.stats || {}) },
+    badges: s.player?.badges ?? [],
+    rewards: s.player?.rewards ?? [],
   });
-}
-
-function readState() {
-  if (!fs.existsSync(DATA_FILE)) {
-    writeState(defaultState);
-    return defaultState;
+  for (const id of Object.keys(s.leads)) {
+    s.leads[id].level = calculateLevel(s.leads[id].xp ?? 0);
   }
-  const data = fs.readFileSync(DATA_FILE, 'utf8');
-  try {
-    const parsed = JSON.parse(data);
-    if (!parsed.globalEvents) parsed.globalEvents = defaultState.globalEvents;
-    parsed.player = normalizePlayer(parsed.player ?? defaultState.player);
-    if (parsed.leads) {
-      const { calculateLevel } = require('./xpEngine');
-      for (const id of Object.keys(parsed.leads)) {
-        parsed.leads[id].level = calculateLevel(parsed.leads[id].xp ?? 0);
-      }
-    }
-    return parsed;
-  } catch(e) {
-    return defaultState;
-  }
+  return s;
 }
 
-function writeState(state) {
-  fs.writeFileSync(DATA_FILE, JSON.stringify(state, null, 2), 'utf8');
+/** Load + normalize the full game state (async — Supabase or file). */
+async function readState() {
+  const raw = await loadRaw(defaultState);
+  return normalize(raw);
 }
 
-function getLead(id) {
-  const state = readState();
-  return state.leads[id] || null;
+/** Persist the full game state. */
+async function writeState(state) {
+  await saveRaw(state);
 }
 
-function saveLead(id, leadData) {
-  const state = readState();
-  state.leads[id] = leadData;
-  writeState(state);
-}
-
-function getPlayer() {
-  const state = readState();
-  return state.player;
-}
-
-function updatePlayer(playerData) {
-  const state = readState();
-  state.player = { ...state.player, ...playerData };
-  writeState(state);
-}
-
-function addGlobalEvent(text) {
-  const state = readState();
+/** Mutate the in-memory state's rolling event log (newest first, capped at 5). */
+function pushGlobalEvent(state, text) {
   state.globalEvents.unshift(text);
   if (state.globalEvents.length > 5) state.globalEvents.pop();
-  writeState(state);
 }
 
 module.exports = {
   readState,
   writeState,
-  getLead,
-  saveLead,
-  getPlayer,
-  updatePlayer,
-  addGlobalEvent
+  pushGlobalEvent,
+  defaultState,
 };
