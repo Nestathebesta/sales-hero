@@ -11,7 +11,7 @@ require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 const express = require('express');
 const cors = require('cors');
 const { processEvent } = require('./xpCalculator');
-const { readState, writeState } = require('./state');
+const { readState, writeState, pushGlobalEvent } = require('./state');
 const { generateBriefing, generateNextAction, generateDailyRecap } = require('./ai');
 const { classifyEventTitle, deriveEntity, slug } = require('./classify');
 
@@ -35,6 +35,39 @@ app.post('/api/webhook', async (req, res) => {
   } catch (err) {
     console.error('Webhook failed:', err.message);
     return res.status(500).json({ error: 'Failed to process event' });
+  }
+});
+
+// Upsert a real prospect (e.g. AgencyZoom "New Lead" -> Zapier -> here).
+// Creates a "New"-stage lead (no activity yet) so it shows in the pipeline/picker.
+app.post('/api/lead', async (req, res) => {
+  try {
+    const { name, productLine, externalId, source } = req.body || {};
+    if (!name || !String(name).trim()) return res.status(400).json({ error: 'Missing name' });
+
+    const state = await readState();
+    const id = externalId
+      ? `az_${slug(String(externalId))}`
+      : `lead_${slug(String(name))}`;
+    const existing = state.leads[id];
+    state.leads[id] = {
+      id,
+      name: String(name).trim().slice(0, 60),
+      xp: existing?.xp ?? 0,
+      level: existing?.level ?? 1,
+      events: existing?.events ?? [],
+      type: 'Prospect',
+      productLine: (productLine && String(productLine).toLowerCase()) || existing?.productLine || null,
+      source: source || existing?.source || 'agencyzoom',
+    };
+    if (!existing) {
+      pushGlobalEvent(state, `New prospect ${state.leads[id].name} entered the pipeline!`);
+    }
+    await writeState(state);
+    res.json({ success: true, lead: state.leads[id], created: !existing });
+  } catch (err) {
+    console.error('Lead upsert failed:', err.message);
+    res.status(500).json({ error: 'Failed to upsert lead' });
   }
 });
 
