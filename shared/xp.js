@@ -59,10 +59,10 @@ export function unlockLevelForReward(rewardKey) {
 }
 
 export const APPEARANCE_OPTIONS = [
-  { id: 'boy_default', character: 'boy', skin: 'default', label: 'Squire', rewardKey: null },
-  { id: 'girl_default', character: 'girl', skin: 'default', label: 'Knight Errant', rewardKey: 'girl' },
-  { id: 'boy_champion', character: 'boy', skin: 'champion', label: 'Crusader', rewardKey: 'boy_champion' },
-  { id: 'girl_champion', character: 'girl', skin: 'champion', label: 'Commander', rewardKey: 'girl_champion' },
+  { id: 'boy_default', character: 'boy', skin: 'default', label: 'Squire', rewardKey: null, art: '/avatars/rank-squire.png' },
+  { id: 'girl_default', character: 'girl', skin: 'default', label: 'Knight Errant', rewardKey: 'girl', art: '/avatars/rank-knight.png' },
+  { id: 'boy_champion', character: 'boy', skin: 'champion', label: 'Crusader', rewardKey: 'boy_champion', art: '/avatars/rank-crusader.png' },
+  { id: 'girl_champion', character: 'girl', skin: 'champion', label: 'Commander', rewardKey: 'girl_champion', art: '/avatars/rank-commander.png' },
 ];
 
 export function syncPlayerProgression(player) {

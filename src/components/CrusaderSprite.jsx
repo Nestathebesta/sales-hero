@@ -5,20 +5,19 @@ import {
   ATTACK_LOOP,
   CRUSADER_SPRITE_SHEET,
   DISPLAY_FRAME_SIZE,
-  DISPLAY_SCALE,
+  DISPLAY_SIZE,
   drawSpriteCell,
   IDLE_LOOP,
   IDLE_RESTART_INDEX,
 } from '../game/crusaderSpriteSheet';
 import { useSalesState } from '../hooks/useSalesState';
 
-const CANVAS_PX = DISPLAY_FRAME_SIZE * DISPLAY_SCALE;
-
 /**
  * Lightweight canvas sprite — no Pixi/Phaser overhead for dashboard use.
- * Listens to salesState.closedDeal and plays attack once, then idle.
+ * The canvas backing store renders one 256px cell 1:1; CSS scales it to `size`.
+ * Listens to salesState.closedDeal and plays the attack once, then idles.
  */
-const CrusaderSprite = ({ className = '', scale = DISPLAY_SCALE }) => {
+const CrusaderSprite = ({ className = '', size = DISPLAY_SIZE }) => {
   const canvasRef = useRef(null);
   const sheetRef = useRef(null);
   const rafRef = useRef(0);
@@ -56,10 +55,7 @@ const CrusaderSprite = ({ className = '', scale = DISPLAY_SCALE }) => {
     img.src = CRUSADER_SPRITE_SHEET;
 
     let running = true;
-
-    const renderSize = DISPLAY_FRAME_SIZE * scale;
-    canvas.width = renderSize;
-    canvas.height = renderSize;
+    const renderSize = DISPLAY_FRAME_SIZE;
 
     const tick = (ts) => {
       if (!running) return;
@@ -121,15 +117,15 @@ const CrusaderSprite = ({ className = '', scale = DISPLAY_SCALE }) => {
       cancelAnimationFrame(rafRef.current);
       sheetRef.current = null;
     };
-  }, [scale]);
+  }, []);
 
   return (
     <canvas
       ref={canvasRef}
       className={`crusader-sprite ${className}`.trim()}
-      width={CANVAS_PX}
-      height={CANVAS_PX}
-      style={{ width: CANVAS_PX, height: CANVAS_PX }}
+      width={DISPLAY_FRAME_SIZE}
+      height={DISPLAY_FRAME_SIZE}
+      style={{ width: size, height: size }}
       role="img"
       aria-label="Animated crusader agent"
     />
