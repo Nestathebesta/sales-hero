@@ -72,16 +72,20 @@ const Inventory = ({ leads, onTrigger }) => {
           className="game-select"
           disabled={Boolean(typed)}
         >
-          <option value="" data-name="">— Choose a prospect —</option>
-          <option value="lead_1" data-name="John S.">John S. (Auto)</option>
-          <option value="lead_2" data-name="Sarah M.">Sarah M. (Homeowners)</option>
-          <option value="lead_3" data-name="David L.">David L. (Umbrella)</option>
+          <option value="" data-name="">
+            {leadOptions.length ? '— Choose a prospect —' : '— No prospects yet —'}
+          </option>
           {leadOptions.map((l) => (
             <option key={l.id} value={l.id} data-name={l.name}>
               {l.name} (LVL {l.level})
             </option>
           ))}
         </select>
+        {leadOptions.length === 0 && (
+          <p className="hint-text">
+            Real prospects flow in from AgencyZoom / Google Calendar via Zapier — or type a name below.
+          </p>
+        )}
       </div>
 
       <div className="form-group">

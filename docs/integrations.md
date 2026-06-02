@@ -1,6 +1,8 @@
-# Data inputs — manual & Google Calendar
+# Data inputs — manual, Google Calendar & AgencyZoom
 
-Calls / quotes / closes can enter the game two ways.
+Real prospects and activities enter the game via the Action Lab (manual) and via
+Zapier from Google Calendar and AgencyZoom. The in-app "Existing prospect" picker
+shows only **real** leads that have been ingested (no demo data).
 
 ## 1) Manual input (Action Lab)
 
@@ -60,3 +62,45 @@ POST /api/calendar/event
 > Requires the backend deployed with the Supabase env vars set (see
 > `docs/PROGRESS.md` → Sprint 6). Locally, point the Zap at a tunnel (e.g. ngrok)
 > to `http://localhost:3001`, or just use the Action Lab.
+
+## 3) AgencyZoom → Zapier (real prospects + activities)
+
+This is what makes the "Existing prospect" picker show your real book of business.
+
+### a) Ingest prospects
+
+```
+POST /api/lead
+{ "name": "Acme Roofing", "productLine": "commercial", "externalId": "AZ-12345" }
+```
+
+- Creates (or updates) a **New**-stage prospect — it appears in the pipeline and
+  the Action Lab picker immediately, before any activity.
+- `externalId` (the AgencyZoom lead id) is used to dedupe, so re-syncs update the
+  same prospect. `productLine` (auto/home/umbrella/commercial/life) drives the icon.
+
+**Zap:** Trigger *AgencyZoom → New Lead* → Action *Webhooks by Zapier → POST* to
+`https://<your-vercel-domain>/api/lead`, mapping `name`, `productLine`, and the
+AgencyZoom lead id → `externalId`.
+
+### b) Log activities against those prospects
+
+Point AgencyZoom activity triggers at `/api/webhook`, reusing the **same**
+`externalId` so the activity lands on the right prospect:
+
+```
+POST /api/webhook
+{ "leadId": "az_AZ-12345", "eventType": "insurance/quote",
+  "contactInfo": { "displayName": "Acme Roofing" } }
+```
+
+| AgencyZoom trigger | eventType |
+|---|---|
+| Call / dial logged | `insurance/call` |
+| Quote / proposal sent | `insurance/quote` |
+| Policy bound / sold | `insurance/closed_policy` |
+
+> `leadId` must be `az_` + the slugified `externalId` (lowercase, non-alphanumerics
+> → `_`) so it matches the prospect created in (a). RingCentral call logs can use
+> the same `/api/webhook` pattern.
+
