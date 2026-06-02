@@ -29,3 +29,13 @@ export const fetchBriefing = async () => {
   const response = await axios.get(`${API_URL}/ai/briefing`);
   return response.data;
 };
+
+export const fetchNextAction = async (leadId) => {
+  const response = await axios.get(`${API_URL}/ai/next-action`, { params: { leadId } });
+  return response.data;
+};
+
+export const fetchRecap = async () => {
+  const response = await axios.get(`${API_URL}/ai/recap`);
+  return response.data;
+};
