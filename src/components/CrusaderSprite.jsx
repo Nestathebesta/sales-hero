@@ -17,12 +17,17 @@ import { useSalesState } from '../hooks/useSalesState';
  * The canvas backing store renders one 256px cell 1:1; CSS scales it to `size`.
  * Listens to salesState.closedDeal and plays the attack once, then idles.
  */
-const CrusaderSprite = ({ className = '', size = DISPLAY_SIZE }) => {
+const CrusaderSprite = ({ className = '', size = DISPLAY_SIZE, tint = null }) => {
   const canvasRef = useRef(null);
   const sheetRef = useRef(null);
   const rafRef = useRef(0);
+  const tintRef = useRef(tint);
   const closedDeal = useSalesState((s) => s.closedDeal);
   const prevClosedDeal = useRef(closedDeal);
+
+  useEffect(() => {
+    tintRef.current = tint;
+  }, [tint]);
 
   const animRef = useRef({
     mode: 'idle',
@@ -57,6 +62,20 @@ const CrusaderSprite = ({ className = '', size = DISPLAY_SIZE }) => {
     let running = true;
     const renderSize = DISPLAY_FRAME_SIZE;
 
+    // Draw a frame, then overlay the rank tint (only onto the sprite's pixels).
+    const paint = (cell) => {
+      drawSpriteCell(ctx, sheetRef.current, cell, renderSize);
+      const t = tintRef.current;
+      if (t) {
+        ctx.save();
+        ctx.globalCompositeOperation = 'source-atop';
+        ctx.globalAlpha = 0.42;
+        ctx.fillStyle = t;
+        ctx.fillRect(0, 0, renderSize, renderSize);
+        ctx.restore();
+      }
+    };
+
     const tick = (ts) => {
       if (!running || document.hidden) return; // stop burning frames on a hidden tab
 
@@ -74,7 +93,7 @@ const CrusaderSprite = ({ className = '', size = DISPLAY_SIZE }) => {
             anim.elapsed -= frameMs;
             anim.frameIndex = (anim.frameIndex + 1) % IDLE_LOOP.length;
           }
-          drawSpriteCell(ctx, sheet, IDLE_LOOP[anim.frameIndex], renderSize);
+          paint(IDLE_LOOP[anim.frameIndex]);
         } else {
           const frameMs = ANIM_TIMING.attackFrameMs;
 
@@ -83,9 +102,9 @@ const CrusaderSprite = ({ className = '', size = DISPLAY_SIZE }) => {
               anim.elapsed -= frameMs;
               anim.frameIndex += 1;
             }
-            drawSpriteCell(ctx, sheet, ATTACK_LOOP[anim.frameIndex], renderSize);
+            paint(ATTACK_LOOP[anim.frameIndex]);
           } else {
-            drawSpriteCell(ctx, sheet, ATTACK_LOOP[ATTACK_BRIDGE_INDEX], renderSize);
+            paint(ATTACK_LOOP[ATTACK_BRIDGE_INDEX]);
 
             anim.bridgeHold += dt;
             if (anim.bridgeHold >= ANIM_TIMING.bridgeHoldMs) {

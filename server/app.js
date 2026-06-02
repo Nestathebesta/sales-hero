@@ -13,6 +13,7 @@ const cors = require('cors');
 const { processEvent } = require('./xpCalculator');
 const { readState, writeState } = require('./state');
 const { generateBriefing } = require('./ai');
+const { classifyEventTitle, deriveEntity, slug } = require('./classify');
 
 const app = express();
 app.use(cors());
@@ -22,18 +23,40 @@ app.get('/api/health', (req, res) => {
   res.json({ ok: true });
 });
 
-// Zapier webhook endpoint
+// Zapier / manual webhook endpoint. `count` (1..100) logs a batch in one go.
 app.post('/api/webhook', async (req, res) => {
   try {
-    const { leadId, eventType, contactInfo } = req.body || {};
+    const { leadId, eventType, contactInfo, count } = req.body || {};
     if (!leadId || !eventType) {
       return res.status(400).json({ error: 'Missing leadId or eventType' });
     }
-    const result = await processEvent(leadId, eventType, contactInfo);
+    const result = await processEvent(leadId, eventType, contactInfo, count);
     return res.json({ success: true, ...result });
   } catch (err) {
     console.error('Webhook failed:', err.message);
     return res.status(500).json({ error: 'Failed to process event' });
+  }
+});
+
+// Google Calendar -> Zapier -> here. Classifies the event title into an activity
+// (call/quote/close) by keyword and logs it. Unmatched titles are skipped (200).
+app.post('/api/calendar/event', async (req, res) => {
+  try {
+    const { title, name, count } = req.body || {};
+    if (!title) return res.status(400).json({ error: 'Missing title' });
+
+    const eventType = classifyEventTitle(title);
+    if (!eventType) {
+      return res.json({ success: true, skipped: true, reason: 'no_keyword_match', title });
+    }
+
+    const leadName = (name && String(name).trim()) || deriveEntity(title);
+    const leadId = `cal_${slug(leadName)}`;
+    const result = await processEvent(leadId, eventType, { displayName: leadName }, count);
+    return res.json({ success: true, classifiedAs: eventType, ...result });
+  } catch (err) {
+    console.error('Calendar event failed:', err.message);
+    return res.status(500).json({ error: 'Failed to process calendar event' });
   }
 });
 

@@ -127,11 +127,15 @@ All **P0** features were already shipped. **P1** items were verified complete in
 ```powershell
 cd C:\Users\Nesta\Downloads\sales-hero
 npm install
-cd server; npm install; npm start
 
-# New terminal
-cd C:\Users\Nesta\Downloads\sales-hero
-npm run dev
+# One command runs BOTH the API (3001) and the web app (5173):
+npm run dev:all
 ```
+
+Or run them in two terminals: `npm run server` (API) and `npm run dev` (web).
+The web app calls same-origin `/api`, which Vite proxies to the API in dev — so
+the **GameMaster API must be running** or the dashboard shows "Cannot reach
+GameMaster server." (In production there is no separate server: `/api` is a
+Vercel serverless function.)
 
 App: http://localhost:5173 — API: http://localhost:3001
