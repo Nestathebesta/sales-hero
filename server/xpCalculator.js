@@ -1,10 +1,5 @@
 const { getLead, saveLead, getPlayer, updatePlayer, addGlobalEvent } = require('./state');
-const {
-  calculateLevel,
-  getCareerTitle,
-  getUnlockedRewards,
-  syncPlayerProgression,
-} = require('./xpEngine');
+const { calculateLevel, syncPlayerProgression } = require('./xpEngine');
 
 const XP_MAP = {
   'insurance/call': 30,

@@ -9,6 +9,7 @@ const express = require('express');
 const cors = require('cors');
 const { processEvent } = require('./xpCalculator');
 const { readState, updatePlayer } = require('./state');
+const { generateBriefing } = require('./ai');
 
 const app = express();
 app.use(cors());
@@ -28,6 +29,17 @@ app.post('/webhook', (req, res) => {
 app.get('/state', (req, res) => {
   const state = readState();
   res.json(state);
+});
+
+// War Council — AI coaching briefing (key stays server-side; falls back gracefully)
+app.get('/ai/briefing', async (req, res) => {
+  try {
+    const result = await generateBriefing();
+    res.json(result);
+  } catch (err) {
+    console.error('Briefing failed:', err.message);
+    res.status(500).json({ error: 'Briefing unavailable' });
+  }
 });
 
 // Endpoint to customize character

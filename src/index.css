@@ -67,7 +67,6 @@ h1, h2, h3, h4, h5, h6 {
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
   margin-bottom: 1.25rem;
   position: relative;
-  backdrop-filter: blur(8px);
 }
 
 .hero-panel {
@@ -1450,3 +1449,99 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .funnel-footer strong { color: var(--gold); }
+
+/* ============================================================
+   War Council (AI briefing)
+   ============================================================ */
+.ai-council {
+  margin-bottom: 1.35rem;
+  padding: 0.9rem 1rem;
+  background:
+    radial-gradient(ellipse 90% 120% at 0% 0%, rgba(61, 111, 214, 0.16), transparent),
+    rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(61, 111, 214, 0.4);
+  border-radius: var(--radius-sm);
+}
+
+.ai-council-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+}
+
+.ai-council-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--display-font);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--royal-bright);
+}
+
+.ai-council-refresh {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.ai-council-refresh:hover {
+  color: var(--royal-bright);
+  border-color: rgba(61, 111, 214, 0.5);
+}
+
+.ai-council-summon {
+  margin: 0;
+  width: 100%;
+}
+
+.ai-council-loading {
+  margin: 0;
+  font-style: italic;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% { opacity: 0.5; }
+}
+
+.ai-council-advice {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--text-main);
+  font-style: italic;
+  border-left: 3px solid var(--royal);
+  padding-left: 0.8rem;
+}
+
+.ai-council-note {
+  margin: 0.6rem 0 0;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.ai-council-note--live { color: var(--gold-dim); }
+
+.ai-council-note code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.62rem;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 0.05rem 0.3rem;
+  border-radius: 4px;
+  color: var(--royal-bright);
+}

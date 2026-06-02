@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Phone, FileText, Trophy, ScrollText } from 'lucide-react';
 import { EVENT_TYPES, dateKey, flattenEvents, relativeTime } from '../lib/insights.js';
 
@@ -18,7 +19,7 @@ function dayLabel(key) {
 }
 
 const QuestLog = ({ leads }) => {
-  const events = flattenEvents(leads);
+  const events = useMemo(() => flattenEvents(leads), [leads]);
 
   if (events.length === 0) {
     return (

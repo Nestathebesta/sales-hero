@@ -1,7 +1,7 @@
 /**
  * Builds a clean, game-ready crusader spritesheet from the labeled reference art.
  *
- * The source (`crusader-spritesheet.png`, 2048x2048) is a *reference sheet*: it has
+ * The source (`art-src/crusader-spritesheet.png`, 2048x2048) is a *reference sheet*: it has
  * titles ("CRUSADER IDLE"), per-frame "F1..F4" labels, and a flat gray background.
  * Naive 512px-grid slicing therefore captured title text, label fragments, and
  * off-center knights — which made the in-app idle jitter instead of breathe.
@@ -27,7 +27,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
-const sheetPath = path.join(root, 'public/assets/crusade/crusader-spritesheet.png');
+const sheetPath = path.join(root, 'art-src/crusader-spritesheet.png');
 const outDir = path.join(root, 'public/assets/crusade/frames');
 const cleanSheetPath = path.join(root, 'public/assets/crusade/crusader-clean.png');
 
