@@ -6,7 +6,7 @@ const DATA_FILE = path.join(__dirname, 'data.json');
 
 const defaultState = {
   player: {
-    name: "Agent",
+    name: "Nesta",
     character: "boy",
     skin: "default",
     totalXP: 0,

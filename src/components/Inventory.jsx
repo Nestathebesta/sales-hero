@@ -18,7 +18,7 @@ const ACTIONS = [
     source: 'AgencyZoom',
     xp: 30,
     icon: FileText,
-    variant: 'green',
+    variant: 'gold',
   },
   {
     eventType: 'insurance/closed_policy',

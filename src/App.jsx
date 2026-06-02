@@ -1,13 +1,23 @@
 import { useEffect, useRef, useState } from 'react';
-import { Briefcase, Zap } from 'lucide-react';
+import { Briefcase, Zap, ScrollText, BarChart3 } from 'lucide-react';
 import Character from './components/Character';
+import DailyGoals from './components/DailyGoals';
 import LeadList from './components/LeadList';
 import Inventory from './components/Inventory';
+import QuestLog from './components/QuestLog';
+import StatsDashboard from './components/StatsDashboard';
 import ActivityFeed from './components/ActivityFeed';
 import Badges from './components/Badges';
 import LevelUpToast from './components/LevelUpToast';
 import { fetchState, customizePlayer } from './api';
 import { salesState } from './state/stateManager';
+
+const TABS = [
+  { id: 'leads', label: 'Pipeline', Icon: Briefcase },
+  { id: 'bag', label: 'Action Lab', Icon: Zap },
+  { id: 'chronicle', label: 'Chronicle', Icon: ScrollText },
+  { id: 'war', label: 'War Room', Icon: BarChart3 },
+];
 
 function App() {
   const [gameState, setGameState] = useState(null);
@@ -143,6 +153,7 @@ function App() {
         {gameState && (
           <>
             <Character player={gameState.player} onCustomize={handleCustomize} />
+            <DailyGoals leads={gameState.leads} />
             <Badges stats={gameState.player.stats} badges={gameState.player.badges} />
           </>
         )}
@@ -150,22 +161,17 @@ function App() {
 
       <main className="main-content">
         <nav className="feature-tabs" aria-label="Main sections">
-          <button
-            type="button"
-            className={`tab-btn ${activeTab === 'leads' ? 'active' : ''}`}
-            onClick={() => setActiveTab('leads')}
-          >
-            <Briefcase size={14} aria-hidden="true" />
-            Pipeline
-          </button>
-          <button
-            type="button"
-            className={`tab-btn ${activeTab === 'bag' ? 'active' : ''}`}
-            onClick={() => setActiveTab('bag')}
-          >
-            <Zap size={14} aria-hidden="true" />
-            Action Lab
-          </button>
+          {TABS.map(({ id, label, Icon }) => (
+            <button
+              key={id}
+              type="button"
+              className={`tab-btn ${activeTab === id ? 'active' : ''}`}
+              onClick={() => setActiveTab(id)}
+            >
+              <Icon size={14} aria-hidden="true" />
+              {label}
+            </button>
+          ))}
         </nav>
 
         {gameState && activeTab === 'leads' && (
@@ -174,6 +180,14 @@ function App() {
 
         {gameState && activeTab === 'bag' && (
           <Inventory leads={gameState.leads} onTrigger={loadState} />
+        )}
+
+        {gameState && activeTab === 'chronicle' && (
+          <QuestLog leads={gameState.leads} />
+        )}
+
+        {gameState && activeTab === 'war' && (
+          <StatsDashboard player={gameState.player} leads={gameState.leads} />
         )}
       </main>
     </div>

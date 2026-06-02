@@ -4,11 +4,14 @@
 
 | File | Description |
 |------|-------------|
-| `crusader-spritesheet.png` | 2048×2048 sheet — row 0 = **Idle** (4 frames), row 1 = **Attack** (4 frames) |
-| `frames/idle-0..3.png` | Pre-sliced 64×64 idle frames (`npm run sprites:slice`) |
-| `frames/attack-0..3.png` | Pre-sliced 64×64 attack frames |
+| `crusader-clean.png` | **Runtime sheet** — 1024×512, 256px transparent cells, 4 cols × 2 rows. Row 0 = **Idle** (4 frames), row 1 = **Attack** (4 frames). Every knight is background-removed, centered on its body, and bottom-aligned to a shared feet baseline. |
+| `frames/idle-0..3.png` | Individual 256×256 idle cells (debug/inspection) |
+| `frames/attack-0..3.png` | Individual 256×256 attack cells |
+| `crusader-spritesheet.png` | **Source reference art** (2048×2048) — labeled with titles + "F1..F4" and a flat gray background. Not used at runtime; it is the input to the generator. |
 
-Grid parsing is configured in `src/game/crusaderSpriteSheet.js` (`SOURCE_FRAME_SIZE = 512`).
+Generate the clean sheet + frames from the source with `npm run sprites:slice`
+(`scripts/slice-crusader-sprites.mjs`). Layout is configured in
+`src/game/crusaderSpriteSheet.js` (`SOURCE_FRAME_SIZE = 256`).
 
 ## Animation (CrusaderSprite)
 

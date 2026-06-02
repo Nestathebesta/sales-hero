@@ -5,13 +5,6 @@ import {
 } from '../../shared/xp.js';
 import CrusaderSprite from './CrusaderSprite';
 
-function avatarSrc(character, skin) {
-  const raceMap = { boy: 'human', girl: 'human' };
-  const race = raceMap[character] ?? character;
-  const skinKey = skin === 'champion' ? 'dark_knight' : 'default';
-  return `/avatars/${race}_${skinKey}.png`;
-}
-
 const Character = ({ player, onCustomize }) => {
   if (!player) return null;
 
@@ -23,7 +16,7 @@ const Character = ({ player, onCustomize }) => {
 
       <div className="agent-header">
         <div className="avatar-frame avatar-frame--sprite">
-          <CrusaderSprite className="agent-portrait-sprite" scale={2} />
+          <CrusaderSprite className="agent-portrait-sprite" size={132} />
         </div>
         <div>
           <h3 className="agent-name">{player.name}</h3>
@@ -66,7 +59,7 @@ const Character = ({ player, onCustomize }) => {
                     if (unlocked) onCustomize(skin.character, skin.skin);
                   }}
                 />
-                <img src={avatarSrc(skin.character, skin.skin)} alt={skin.label} />
+                <img src={skin.art} alt={skin.label} />
                 <span>{skin.label}</span>
                 {!unlocked && unlockAt && (
                   <span className="locked-tag">Lv {unlockAt}</span>
