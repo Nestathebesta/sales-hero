@@ -10,6 +10,7 @@ import ActivityFeed from './components/ActivityFeed';
 import Badges from './components/Badges';
 import LevelUpToast from './components/LevelUpToast';
 import { fetchState, customizePlayer } from './api';
+import { MEDALS } from '../shared/xp.js';
 import { salesState } from './state/stateManager';
 
 const TABS = [
@@ -26,6 +27,7 @@ function App() {
   const [error, setError] = useState(null);
   const [levelUpNotice, setLevelUpNotice] = useState(null);
   const prevLevelRef = useRef(null);
+  const prevTitleRef = useRef(null);
   const prevPoliciesRef = useRef(null);
   const lastSigRef = useRef(null);
 
@@ -40,6 +42,7 @@ function App() {
       lastSigRef.current = signature;
 
       const nextLevel = state.player?.level;
+      const nextTitle = state.player?.title ?? 'Squire';
       if (
         prevLevelRef.current !== null &&
         nextLevel != null &&
@@ -47,10 +50,13 @@ function App() {
       ) {
         setLevelUpNotice({
           level: nextLevel,
-          title: state.player.title ?? 'Squire',
+          title: nextTitle,
+          isRankUp: prevTitleRef.current !== null && nextTitle !== prevTitleRef.current,
         });
+        salesState.celebrate(); // crusader swings a victory strike
       }
       if (nextLevel != null) prevLevelRef.current = nextLevel;
+      prevTitleRef.current = nextTitle;
 
       const policies = state.player?.stats?.policies ?? 0;
       if (
@@ -111,6 +117,7 @@ function App() {
         <LevelUpToast
           level={levelUpNotice.level}
           title={levelUpNotice.title}
+          isRankUp={levelUpNotice.isRankUp}
           onDismiss={() => setLevelUpNotice(null)}
         />
       )}
@@ -145,7 +152,7 @@ function App() {
           </div>
           <div className="hud-stat">
             <span className="hud-label">Medals</span>
-            <span className="hud-value">{player.badges?.length ?? 0}/3</span>
+            <span className="hud-value">{player.badges?.length ?? 0}/{MEDALS.length}</span>
           </div>
         </div>
       )}

@@ -1,5 +1,6 @@
 const { getLead, saveLead, getPlayer, updatePlayer, addGlobalEvent } = require('./state');
 const { calculateLevel, syncPlayerProgression } = require('./xpEngine');
+const { MEDALS } = require('./medals');
 
 const XP_MAP = {
   'insurance/call': 30,
@@ -56,25 +57,13 @@ function processEvent(leadId, eventType, contactInfo = {}) {
     if (eventType === 'insurance/quote') player.stats.quotes++;
     if (eventType === 'insurance/closed_policy') player.stats.policies++;
 
-    let badgeEarned = false;
-    if (player.stats.calls >= 25 && !player.badges.includes('Dialer Badge')) {
-      player.badges.push('Dialer Badge');
-      player.totalXP += 150;
-      badgeEarned = 'Dialer Badge';
-    }
-    if (player.stats.quotes >= 10 && !player.badges.includes('Quote Master')) {
-      player.badges.push('Quote Master');
-      player.totalXP += 300;
-      badgeEarned = 'Quote Master';
-    }
-    if (player.stats.policies >= 1 && !player.badges.includes('Closer Badge')) {
-      player.badges.push('Closer Badge');
-      player.totalXP += 500;
-      badgeEarned = 'Closer Badge';
-    }
-
-    if (badgeEarned) {
-      addGlobalEvent(`${player.name} earned the ${badgeEarned}!`);
+    for (const medal of MEDALS) {
+      const progress = player.stats[medal.stat] || 0;
+      if (progress >= medal.target && !player.badges.includes(medal.name)) {
+        player.badges.push(medal.name);
+        player.totalXP += medal.xp;
+        addGlobalEvent(`${player.name} earned the ${medal.name}! (+${medal.xp} EXP)`);
+      }
     }
 
     const newLeadLevel = calculateLevel(lead.xp);

@@ -65,6 +65,23 @@ export const APPEARANCE_OPTIONS = [
   { id: 'girl_champion', character: 'girl', skin: 'champion', label: 'Commander', rewardKey: 'girl_champion', art: '/avatars/rank-commander.png' },
 ];
 
+/**
+ * Tiered campaign medals. Awarded server-side (see server/medals.js — keep in
+ * sync) and displayed in the Badges panel. `stat` keys map to player.stats.
+ * Names are stable: never rename an existing medal or already-earned badges break.
+ */
+export const MEDALS = [
+  { name: 'First Dial', stat: 'calls', target: 1, xp: 50, icon: '📞', blurb: 'Make 1 call' },
+  { name: 'Dialer Badge', stat: 'calls', target: 25, xp: 150, icon: '☎️', blurb: '25 calls' },
+  { name: 'Centurion', stat: 'calls', target: 100, xp: 400, icon: '🎯', blurb: '100 calls' },
+  { name: 'First Quote', stat: 'quotes', target: 1, xp: 50, icon: '📝', blurb: 'Send 1 quote' },
+  { name: 'Quote Master', stat: 'quotes', target: 10, xp: 300, icon: '🗂️', blurb: '10 quotes' },
+  { name: 'Quote Sniper', stat: 'quotes', target: 50, xp: 600, icon: '🎖️', blurb: '50 quotes' },
+  { name: 'Closer Badge', stat: 'policies', target: 1, xp: 500, icon: '🏆', blurb: 'Close 1 policy' },
+  { name: 'Rainmaker', stat: 'policies', target: 10, xp: 1000, icon: '👑', blurb: '10 policies' },
+  { name: 'Conqueror', stat: 'policies', target: 50, xp: 2500, icon: '⚔️', blurb: '50 policies' },
+];
+
 export function syncPlayerProgression(player) {
   const level = calculateLevel(player.totalXP ?? 0);
   return {

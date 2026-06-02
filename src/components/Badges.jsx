@@ -1,30 +1,30 @@
-const BADGE_DEFS = [
-  { name: 'Dialer Badge', statKey: 'calls', target: 25, icon: '📞' },
-  { name: 'Quote Master', statKey: 'quotes', target: 10, icon: '📝' },
-  { name: 'Closer Badge', statKey: 'policies', target: 1, icon: '🏆' },
-];
+import { MEDALS } from '../../shared/xp.js';
 
 const Badges = ({ stats, badges }) => {
+  const earnedCount = MEDALS.filter((m) => badges.includes(m.name)).length;
+
   return (
     <div className="panel hero-panel badges-panel">
-      <h3 className="panel-title panel-title--gold">Campaign Medals</h3>
+      <h3 className="panel-title panel-title--gold">
+        Campaign Medals <span className="medal-tally">{earnedCount}/{MEDALS.length}</span>
+      </h3>
 
       <div className="badge-grid">
-        {BADGE_DEFS.map((b) => {
-          const earned = badges.includes(b.name);
-          const current = stats[b.statKey] || 0;
-          const progress = Math.min(100, Math.floor((current / b.target) * 100));
+        {MEDALS.map((m) => {
+          const earned = badges.includes(m.name);
+          const current = stats[m.stat] || 0;
+          const progress = Math.min(100, Math.floor((current / m.target) * 100));
           return (
-            <div key={b.name} className={`badge-card ${earned ? 'earned' : ''}`}>
-              <div className="badge-icon">{b.icon}</div>
-              <div className="badge-name">{b.name}</div>
+            <div key={m.name} className={`badge-card ${earned ? 'earned' : ''}`} title={m.blurb}>
+              <div className="badge-icon">{m.icon}</div>
+              <div className="badge-name">{m.name}</div>
               {!earned && (
                 <div className="badge-progress-wrap">
                   <div className="badge-progress-bar" style={{ width: `${progress}%` }} />
                 </div>
               )}
               <div className="badge-requirement">
-                {earned ? 'Earned!' : `${current}/${b.target}`}
+                {earned ? 'Earned!' : `${current}/${m.target}`}
               </div>
             </div>
           );
