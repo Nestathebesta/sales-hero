@@ -1618,3 +1618,53 @@ h1, h2, h3, h4, h5, h6 {
   .level-up-burst { animation: none; opacity: 0; }
   .level-up-toast--rankup { animation: slideIn 0.35s ease-out; }
 }
+
+/* ============================================================
+   Action Lab quantity stepper + Chronicle multiplier
+   ============================================================ */
+.qty-stepper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.qty-btn {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--text-main);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.qty-btn:hover {
+  border-color: rgba(61, 111, 214, 0.5);
+  color: var(--royal-bright);
+}
+
+.qty-input {
+  width: 64px;
+  text-align: center;
+  padding: 0.5rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--text-main);
+  font-family: var(--body-font);
+  font-size: 0.95rem;
+}
+
+.qty-input:focus {
+  outline: none;
+  border-color: rgba(61, 111, 214, 0.5);
+}
+
+.quest-mult {
+  color: var(--gold);
+  font-weight: 700;
+}

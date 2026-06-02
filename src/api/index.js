@@ -15,11 +15,12 @@ export const customizePlayer = async (character, skin) => {
   return response.data;
 };
 
-export const triggerWebhook = async (leadId, eventType, contactInfo = {}) => {
+export const triggerWebhook = async (leadId, eventType, contactInfo = {}, count = 1) => {
   const response = await axios.post(`${API_URL}/webhook`, {
     leadId,
     eventType,
     contactInfo,
+    count,
   });
   return response.data;
 };

@@ -67,6 +67,7 @@ const QuestLog = ({ leads }) => {
                     </span>
                     <span className="quest-text">
                       {label} — <strong>{ev.leadName}</strong>
+                      {ev.count > 1 ? <span className="quest-mult"> ×{ev.count}</span> : null}
                     </span>
                     <span className="quest-xp">+{ev.xp}</span>
                     <span className="quest-time">{relativeTime(ev.timestamp)}</span>

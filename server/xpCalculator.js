@@ -23,27 +23,34 @@ function privacyName(contactInfo = {}) {
  * Apply a pipeline event: loads the full state once, mutates it in memory
  * (lead XP, player XP/stats/medals/level, event log), and persists once.
  */
-async function processEvent(leadId, eventType, contactInfo = {}) {
+async function processEvent(leadId, eventType, contactInfo = {}, count = 1) {
+  const n = Math.max(1, Math.min(100, Math.floor(Number(count)) || 1));
   const state = await readState();
   const player = state.player; // already level/title-synced by readState
   const previousPlayerLevel = player.level;
 
   let lead = state.leads[leadId];
   if (!lead) {
-    lead = { id: leadId, name: privacyName(contactInfo), xp: 0, level: 1, events: [], type: 'Prospect' };
+    // displayName (manual/calendar entries) is user-chosen — keep it verbatim;
+    // otherwise mask CRM PII to "First L." via privacyName.
+    const leadName = contactInfo.displayName
+      ? String(contactInfo.displayName).slice(0, 48)
+      : privacyName(contactInfo);
+    lead = { id: leadId, name: leadName, xp: 0, level: 1, events: [], type: 'Prospect' };
     state.leads[leadId] = lead;
     pushGlobalEvent(state, `New prospect ${lead.name} entered the pipeline!`);
   }
   const previousLeadLevel = lead.level ?? 1;
 
-  const earnedXP = XP_MAP[eventType] || 0;
-  if (earnedXP > 0) {
+  const perXP = XP_MAP[eventType] || 0;
+  const earnedXP = perXP * n;
+  if (perXP > 0) {
     lead.xp += earnedXP;
     player.totalXP += earnedXP;
 
-    if (eventType === 'insurance/call') player.stats.calls += 1;
-    if (eventType === 'insurance/quote') player.stats.quotes += 1;
-    if (eventType === 'insurance/closed_policy') player.stats.policies += 1;
+    if (eventType === 'insurance/call') player.stats.calls += n;
+    if (eventType === 'insurance/quote') player.stats.quotes += n;
+    if (eventType === 'insurance/closed_policy') player.stats.policies += n;
 
     for (const medal of MEDALS) {
       const progress = player.stats[medal.stat] || 0;
@@ -65,17 +72,19 @@ async function processEvent(leadId, eventType, contactInfo = {}) {
       pushGlobalEvent(state, `${player.name} was promoted to ${player.title}! (Level ${player.level})`);
     }
 
-    lead.events.push({ type: eventType, xp: earnedXP, timestamp: new Date().toISOString() });
+    // One record carries the quantity (count) — keeps the event log compact.
+    lead.events.push({ type: eventType, xp: perXP, count: n, timestamp: new Date().toISOString() });
 
     let actionText = 'interacted with';
-    if (eventType === 'insurance/call') actionText = 'called';
-    if (eventType === 'insurance/quote') actionText = 'sent a P&C quote to';
-    if (eventType === 'insurance/closed_policy') actionText = 'closed a policy for';
-    pushGlobalEvent(state, `${player.name} ${actionText} ${lead.name}. (+${earnedXP} EXP)`);
+    if (eventType === 'insurance/call') actionText = n > 1 ? 'logged calls for' : 'called';
+    if (eventType === 'insurance/quote') actionText = n > 1 ? 'sent quotes to' : 'sent a P&C quote to';
+    if (eventType === 'insurance/closed_policy') actionText = n > 1 ? 'closed policies for' : 'closed a policy for';
+    const qty = n > 1 ? ` ×${n}` : '';
+    pushGlobalEvent(state, `${player.name} ${actionText} ${lead.name}${qty}. (+${earnedXP} EXP)`);
   }
 
   await writeState(state);
-  return { lead, player, earnedXP };
+  return { lead, player, earnedXP, count: n };
 }
 
 module.exports = { processEvent, calculateLevel };

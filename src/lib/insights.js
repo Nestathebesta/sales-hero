@@ -39,12 +39,14 @@ export function flattenEvents(leads) {
   const out = [];
   for (const lead of Object.values(leads || {})) {
     for (const ev of lead.events || []) {
+      const count = ev.count ?? 1;
       out.push({
         leadId: lead.id,
         leadName: lead.name,
         type: ev.type,
         kind: EVENT_TYPES[ev.type]?.kind ?? 'other',
-        xp: ev.xp ?? 0,
+        count,
+        xp: (ev.xp ?? 0) * count, // total XP for the batch
         timestamp: ev.timestamp,
         ts: new Date(ev.timestamp).getTime(),
       });
@@ -59,11 +61,12 @@ export function dailyCounts(events) {
   for (const e of events) {
     const key = dateKey(e.timestamp);
     const bucket = (map[key] ??= { calls: 0, quotes: 0, policies: 0, xp: 0, total: 0 });
-    if (e.kind === 'call') bucket.calls += 1;
-    else if (e.kind === 'quote') bucket.quotes += 1;
-    else if (e.kind === 'close') bucket.policies += 1;
-    bucket.xp += e.xp;
-    bucket.total += 1;
+    const c = e.count ?? 1;
+    if (e.kind === 'call') bucket.calls += c;
+    else if (e.kind === 'quote') bucket.quotes += c;
+    else if (e.kind === 'close') bucket.policies += c;
+    bucket.xp += e.xp; // already total for the batch
+    bucket.total += c;
   }
   return map;
 }
