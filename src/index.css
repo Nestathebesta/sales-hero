@@ -1545,3 +1545,76 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 4px;
   color: var(--royal-bright);
 }
+
+/* ============================================================
+   Medal tally + Level-up / Rank-up celebration
+   ============================================================ */
+.medal-tally {
+  float: right;
+  font-size: 0.72rem;
+  color: var(--gold-dim);
+  font-family: var(--body-font);
+  letter-spacing: 0;
+}
+
+/* keep the burst behind the icon/text but above the toast background */
+.level-up-icon,
+.level-up-body {
+  position: relative;
+  z-index: 1;
+}
+
+.level-up-burst {
+  position: absolute;
+  left: 2.1rem;
+  top: 50%;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.55), transparent 70%);
+  animation: burst 0.9s ease-out forwards;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes burst {
+  0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0.9; }
+  100% { transform: translate(-50%, -50%) scale(4.2); opacity: 0; }
+}
+
+.level-up-toast--rankup {
+  border-color: var(--gold);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.55),
+    0 0 30px rgba(212, 175, 55, 0.4),
+    0 0 60px rgba(61, 111, 214, 0.25);
+  animation: slideIn 0.35s ease-out, rankPulse 1.6s ease-in-out 0.35s 2;
+}
+
+.level-up-toast--rankup .level-up-icon {
+  color: var(--gold);
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.7));
+}
+
+.level-up-toast--rankup .level-up-kicker { color: var(--gold); }
+.level-up-toast--rankup .level-up-title { color: var(--gold); }
+
+.level-up-toast--rankup .level-up-burst {
+  width: 52px;
+  height: 52px;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.7), transparent 70%);
+  animation: burst 1.2s ease-out forwards;
+}
+
+@keyframes rankPulse {
+  50% { box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.55),
+    0 0 44px rgba(212, 175, 55, 0.6),
+    0 0 80px rgba(61, 111, 214, 0.35); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .level-up-burst { animation: none; opacity: 0; }
+  .level-up-toast--rankup { animation: slideIn 0.35s ease-out; }
+}

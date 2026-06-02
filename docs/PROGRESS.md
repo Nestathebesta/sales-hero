@@ -81,8 +81,9 @@ All **P0** features were already shipped. **P1** items were verified complete in
 | 2c | Clean transparent sprite pipeline, crusader-palette retheme, rank tokens | **Done** (June 2026) |
 | 3 | Chronicle (activity log), daily goals + streaks | **Done** (June 2026) |
 | 4 | War Room performance dashboard + inline SVG charts | **Done** (June 2026) |
-| 5 | Pipeline stage board; Level-up UX, expanded medals | **Partial** — stage board done (June 2026) |
-| 6 | Supabase + multi-agent | Pending |
+| 5 | Pipeline stage board, level-up UX, expanded medals | **Done** (June 2026) |
+| 5b | War Council AI (Vercel AI Gateway), snappiness audit fixes, asset trim | **Done** (June 2026) |
+| 6 | Backend deploy (serverless) + Supabase persistence + more AI | Pending |
 
 ### Sprint 2c–4 notes (June 2026)
 

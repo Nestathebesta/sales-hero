@@ -51,6 +51,17 @@ export const salesState = {
     notify();
   },
 
+  /** Victory strike — the crusader swings on a level-up / rank-up. */
+  celebrate() {
+    state = {
+      ...state,
+      closedDeal: state.closedDeal + 1,
+      lastEventType: 'level_up',
+      lastEventAt: Date.now(),
+    };
+    notify();
+  },
+
   /**
    * @param {string} eventType
    */
