@@ -20,12 +20,13 @@ function privacyName(contactInfo = {}) {
 }
 
 /**
- * Apply a pipeline event: loads the full state once, mutates it in memory
- * (lead XP, player XP/stats/medals/level, event log), and persists once.
+ * Apply a pipeline event to an already-loaded state IN MEMORY (no I/O):
+ * mutates lead XP, player XP/stats/medals/level and the event log. The caller
+ * is responsible for persisting via writeState — this lets a batch (e.g. the
+ * Structured task sync) apply many events on one held state and save once.
  */
-async function processEvent(leadId, eventType, contactInfo = {}, count = 1) {
+function applyEvent(state, leadId, eventType, contactInfo = {}, count = 1) {
   const n = Math.max(1, Math.min(100, Math.floor(Number(count)) || 1));
-  const state = await readState();
   const player = state.player; // already level/title-synced by readState
   const previousPlayerLevel = player.level;
 
@@ -83,8 +84,18 @@ async function processEvent(leadId, eventType, contactInfo = {}, count = 1) {
     pushGlobalEvent(state, `${player.name} ${actionText} ${lead.name}${qty}. (+${earnedXP} EXP)`);
   }
 
-  await writeState(state);
   return { lead, player, earnedXP, count: n };
 }
 
-module.exports = { processEvent, calculateLevel };
+/**
+ * Load the full state once, apply a single pipeline event in memory, persist
+ * once. The webhook/calendar routes use this; batch callers use applyEvent.
+ */
+async function processEvent(leadId, eventType, contactInfo = {}, count = 1) {
+  const state = await readState();
+  const result = applyEvent(state, leadId, eventType, contactInfo, count);
+  await writeState(state);
+  return result;
+}
+
+module.exports = { processEvent, applyEvent, calculateLevel };

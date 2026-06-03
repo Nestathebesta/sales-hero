@@ -14,6 +14,8 @@ const { processEvent } = require('./xpCalculator');
 const { readState, writeState, pushGlobalEvent } = require('./state');
 const { generateBriefing, generateNextAction, generateDailyRecap } = require('./ai');
 const { classifyEventTitle, deriveEntity, slug } = require('./classify');
+const { syncStructuredTasks } = require('./structured');
+const { isConfigured, fetchStructuredTasks } = require('./structuredClient');
 
 const app = express();
 app.use(cors());
@@ -90,6 +92,48 @@ app.post('/api/calendar/event', async (req, res) => {
   } catch (err) {
     console.error('Calendar event failed:', err.message);
     return res.status(500).json({ error: 'Failed to process calendar event' });
+  }
+});
+
+// Structured planner sync. A poller (Claude MCP loop / scheduled routine) pulls
+// the user's tasks and POSTs a snapshot here. Creates a quest per task and
+// awards XP once, on the not-completed -> completed edge. Idempotent: re-POSTing
+// the same snapshot is a no-op for already-awarded tasks.
+//
+// Body: { tasks: [{ id, title, note?, day?, start_time?, symbol?,
+//                   completed (bool), completed_at? }] }
+app.post('/api/structured/sync', async (req, res) => {
+  try {
+    const tasks = req.body?.tasks;
+    if (!Array.isArray(tasks)) {
+      return res.status(400).json({ error: 'Missing tasks array' });
+    }
+    const state = await readState();
+    const summary = syncStructuredTasks(state, tasks);
+    await writeState(state);
+    return res.json({ success: true, ...summary });
+  } catch (err) {
+    console.error('Structured sync failed:', err.message);
+    return res.status(500).json({ error: 'Failed to sync Structured tasks' });
+  }
+});
+
+// App-native pull: the server connects to Structured over MCP itself, pulls the
+// planner, and reconciles — same as the poller's tick but on demand. 503 until
+// STRUCTURED_MCP_URL is configured (see docs/integrations.md §4).
+app.post('/api/structured/pull', async (req, res) => {
+  if (!isConfigured()) {
+    return res.status(503).json({ error: 'Structured MCP not configured (set STRUCTURED_MCP_URL)' });
+  }
+  try {
+    const tasks = await fetchStructuredTasks();
+    const state = await readState();
+    const summary = syncStructuredTasks(state, tasks);
+    await writeState(state);
+    return res.json({ success: true, pulled: tasks.length, ...summary });
+  } catch (err) {
+    console.error('Structured pull failed:', err.message);
+    return res.status(502).json({ error: 'Failed to pull from Structured', detail: err.message });
   }
 });
 

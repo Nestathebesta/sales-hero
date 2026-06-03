@@ -12,8 +12,15 @@ const path = require('path');
 const DATA_FILE = path.join(__dirname, 'data.json');
 const ROW_ID = 'singleton';
 
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+// Accept either the classic env names or the ones provisioned by the
+// Supabase↔Vercel integration / newer key scheme. MUST be a server-side secret
+// key (service_role or sb_secret_…) — it bypasses RLS. Never use a publishable/
+// anon key here (RLS would block the single-row read/write).
+const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+const SERVICE_KEY =
+  process.env.SUPABASE_SERVICE_ROLE_KEY ||
+  process.env.SUPABASE_SECRET_KEY ||
+  process.env.SUPABASE_KEY;
 const useSupabase = Boolean(SUPABASE_URL && SERVICE_KEY);
 
 let supabase = null;
