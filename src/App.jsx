@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { Briefcase, Zap, ScrollText, BarChart3 } from 'lucide-react';
+import { Briefcase, Zap, ScrollText, BarChart3, ListTodo } from 'lucide-react';
 import Character from './components/Character';
 import DailyGoals from './components/DailyGoals';
 import LeadList from './components/LeadList';
 import Inventory from './components/Inventory';
 import QuestLog from './components/QuestLog';
+import TaskQuests from './components/TaskQuests';
 import StatsDashboard from './components/StatsDashboard';
 import ActivityFeed from './components/ActivityFeed';
 import Badges from './components/Badges';
@@ -16,6 +17,7 @@ import { salesState } from './state/stateManager';
 const TABS = [
   { id: 'leads', label: 'Pipeline', Icon: Briefcase },
   { id: 'bag', label: 'Action Lab', Icon: Zap },
+  { id: 'quests', label: 'Quests', Icon: ListTodo },
   { id: 'chronicle', label: 'Chronicle', Icon: ScrollText },
   { id: 'war', label: 'War Room', Icon: BarChart3 },
 ];
@@ -210,6 +212,10 @@ function App() {
 
         {gameState && activeTab === 'bag' && (
           <Inventory leads={gameState.leads} onTrigger={loadState} />
+        )}
+
+        {gameState && activeTab === 'quests' && (
+          <TaskQuests tasks={gameState.tasks} />
         )}
 
         {gameState && activeTab === 'chronicle' && (

@@ -14,6 +14,8 @@ const defaultState = {
     stats: { calls: 0, quotes: 0, policies: 0 },
   },
   leads: {},
+  // Structured planner tasks ingested as quests, keyed by Structured task id.
+  tasks: {},
   globalEvents: ['Welcome to the Sales Crusade! Open Action Lab and log your first pipeline activity.'],
 };
 
@@ -22,6 +24,7 @@ function normalize(state) {
   const s = state && typeof state === 'object' ? state : {};
   s.globalEvents = Array.isArray(s.globalEvents) ? s.globalEvents : defaultState.globalEvents.slice();
   s.leads = s.leads && typeof s.leads === 'object' ? s.leads : {};
+  s.tasks = s.tasks && typeof s.tasks === 'object' ? s.tasks : {};
   s.player = syncPlayerProgression({
     ...defaultState.player,
     ...(s.player || {}),
