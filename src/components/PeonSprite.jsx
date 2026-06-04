@@ -72,6 +72,10 @@ const PeonSprite = ({ size = 132, fallbackArt = '/assets/Peon/Peon.jpeg', label 
       if (!running) return;
 
       const cell = manifest.cell || 128;
+      // Render mode: clean frame-swaps (like the crusader) by default for crisp
+      // frames; set "crossfade": true in the manifest for blended (softer/
+      // smoother-at-slow-speed) motion instead.
+      const crossfade = manifest.crossfade === true;
       // Per-animation loop duration (ms) → calm, slow breathing; quick blinks.
       // Falls back to a slow default so nothing ever plays at a frantic rate.
       const DEFAULT_LOOP_MS = 4200;
@@ -134,7 +138,7 @@ const PeonSprite = ({ size = 132, fallbackArt = '/assets/Peon/Peon.jpeg', label 
         ctx.clearRect(0, 0, cell, cell);
         ctx.globalAlpha = 1;
         ctx.drawImage(img, fA * cell, sy, cell, cell, 0, 0, cell, cell);
-        if (fB !== fA && frac > 0.001) {
+        if (crossfade && fB !== fA && frac > 0.001) {
           ctx.globalAlpha = smooth(frac);
           ctx.drawImage(img, fB * cell, sy, cell, cell, 0, 0, cell, cell);
           ctx.globalAlpha = 1;
