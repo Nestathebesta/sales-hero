@@ -373,6 +373,42 @@ h1, h2, h3, h4, h5, h6 {
   filter: drop-shadow(0 5px 6px rgba(0, 0, 0, 0.5));
 }
 
+/* Rank character portrait in the Crusader Card — gentle idle "breathing/float",
+   with a quick cheer pop on a closed deal. */
+.rank-avatar {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 7px rgba(0, 0, 0, 0.55));
+  transform-origin: center bottom;
+  will-change: transform;
+}
+
+.rank-avatar--idle {
+  animation: rankIdle 2.8s ease-in-out infinite;
+}
+
+.rank-avatar--cheer {
+  animation: rankCheer 0.68s ease-out;
+}
+
+@keyframes rankIdle {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-4px) scale(1.015); }
+}
+
+@keyframes rankCheer {
+  0% { transform: translateY(0) scale(1); }
+  35% { transform: translateY(-10px) scale(1.1); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rank-avatar--idle,
+  .rank-avatar--cheer { animation: none; }
+}
+
 .agent-portrait {
   width: 88px;
   height: 88px;

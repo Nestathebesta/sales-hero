@@ -42,15 +42,19 @@ async function loadRaw(defaultState) {
       .maybeSingle();
     if (error) throw new Error(`Supabase load failed: ${error.message}`);
     if (!data) {
-      await saveRaw(defaultState);
-      return defaultState;
+      // Deep-copy the seed so callers never mutate the shared defaultState
+      // singleton (which would pollute later reads and /api/player/reset).
+      const seed = JSON.parse(JSON.stringify(defaultState));
+      await saveRaw(seed);
+      return seed;
     }
     return data.data;
   }
 
   if (!fs.existsSync(DATA_FILE)) {
-    fs.writeFileSync(DATA_FILE, JSON.stringify(defaultState, null, 2), 'utf8');
-    return defaultState;
+    const seed = JSON.parse(JSON.stringify(defaultState));
+    fs.writeFileSync(DATA_FILE, JSON.stringify(seed, null, 2), 'utf8');
+    return seed;
   }
   return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
 }

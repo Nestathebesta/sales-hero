@@ -39,3 +39,4 @@ server/data.json
 
 # Claude Code — keep shared launch config, ignore machine-local settings
 .claude/settings.local.json
+.claude/scheduled_tasks.lock
