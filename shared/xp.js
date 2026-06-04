@@ -2,6 +2,10 @@
 
 export const XP_PER_LEVEL_SQUARE = 50;
 
+// Max attainable level. Raised to fit the 8 career ranks spaced ~30 levels apart
+// (Grand Marshal tops out at 211). KEEP IN SYNC with server/xpEngine.js.
+export const MAX_LEVEL = 211;
+
 /** Total XP required to reach a given level (level 1 = 0). */
 export function xpRequiredForLevel(level) {
   if (level <= 1) return 0;
@@ -12,7 +16,7 @@ export function calculateLevel(totalXP) {
   let level = 1;
   while (totalXP >= xpRequiredForLevel(level + 1)) {
     level += 1;
-    if (level >= 99) break;
+    if (level >= MAX_LEVEL) break;
   }
   return level;
 }
@@ -34,13 +38,13 @@ export function xpProgressInLevel(totalXP, level) {
  */
 export const CAREER_RANKS = [
   { minLevel: 1, title: 'Peon', unlockKey: null, art: '/assets/Peon/Peon.jpeg' },
-  { minLevel: 2, title: 'Scribe', unlockKey: null, art: '/assets/Scribe/Scribe.jpeg' },
-  { minLevel: 3, title: 'Messenger', unlockKey: null, art: '/assets/Messenger/Messenger.jpeg' },
-  { minLevel: 8, title: 'Crusader', unlockKey: null, art: '/assets/Crusader/Crusader.jpeg' },
-  { minLevel: 16, title: 'Veteran', unlockKey: null, art: '/assets/Veteran/Veteran.jpeg' },
-  { minLevel: 28, title: 'Whale Hunter', unlockKey: null, art: '/assets/Whale Hunter/Whale Hunter.jpeg' },
-  { minLevel: 44, title: 'Captain', unlockKey: null, art: '/assets/Captain/Captain.jpeg' },
-  { minLevel: 65, title: 'Grand Marshal', unlockKey: null, art: '/assets/Grand Marshal/Grand Marshal.jpeg' },
+  { minLevel: 31, title: 'Scribe', unlockKey: null, art: '/assets/Scribe/Scribe.jpeg' },
+  { minLevel: 61, title: 'Messenger', unlockKey: null, art: '/assets/Messenger/Messenger.jpeg' },
+  { minLevel: 91, title: 'Crusader', unlockKey: null, art: '/assets/Crusader/Crusader.jpeg' },
+  { minLevel: 121, title: 'Veteran', unlockKey: null, art: '/assets/Veteran/Veteran.jpeg' },
+  { minLevel: 151, title: 'Whale Hunter', unlockKey: null, art: '/assets/Whale Hunter/Whale Hunter.jpeg' },
+  { minLevel: 181, title: 'Captain', unlockKey: null, art: '/assets/Captain/Captain.jpeg' },
+  { minLevel: 211, title: 'Grand Marshal', unlockKey: null, art: '/assets/Grand Marshal/Grand Marshal.jpeg' },
 ];
 
 export function getCareerTitle(level) {
