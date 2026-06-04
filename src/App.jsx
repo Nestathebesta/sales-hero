@@ -44,7 +44,7 @@ function App() {
       lastSigRef.current = signature;
 
       const nextLevel = state.player?.level;
-      const nextTitle = state.player?.title ?? 'Squire';
+      const nextTitle = state.player?.title ?? 'Peon';
       if (
         prevLevelRef.current !== null &&
         nextLevel != null &&
@@ -138,7 +138,7 @@ function App() {
           </div>
           <div className="hud-stat">
             <span className="hud-label">Rank</span>
-            <span className="hud-value hud-highlight">{player.title ?? 'Squire'}</span>
+            <span className="hud-value hud-highlight">{player.title ?? 'Peon'}</span>
           </div>
           <div className="hud-stat">
             <span className="hud-label">Level</span>

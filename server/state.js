@@ -8,7 +8,7 @@ const defaultState = {
     skin: 'default',
     totalXP: 0,
     level: 1,
-    title: 'Squire',
+    title: 'Peon',
     rewards: [],
     badges: [],
     stats: { calls: 0, quotes: 0, policies: 0 },
