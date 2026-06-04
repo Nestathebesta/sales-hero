@@ -1,10 +1,9 @@
 import {
   CAREER_RANKS,
   getCareerRank,
-  appearanceTint,
   xpProgressInLevel,
 } from '../../shared/xp.js';
-import CrusaderSprite from './CrusaderSprite';
+import RankAvatar from './RankAvatar';
 
 // Ranks whose emblem image isn't in /public yet fall back to this.
 const RANK_ART_FALLBACK = '/avatars/rank-crusader.png';
@@ -13,7 +12,6 @@ const Character = ({ player }) => {
   if (!player) return null;
 
   const { current, needed, percent } = xpProgressInLevel(player.totalXP, player.level);
-  const heroTint = appearanceTint(player);
   const currentRank = getCareerRank(player.level);
 
   return (
@@ -22,7 +20,7 @@ const Character = ({ player }) => {
 
       <div className="agent-header">
         <div className="avatar-frame avatar-frame--sprite">
-          <CrusaderSprite className="agent-portrait-sprite" size={132} tint={heroTint} />
+          <RankAvatar art={currentRank.art} label={currentRank.title} size={132} />
         </div>
         <div>
           <h3 className="agent-name">{player.name}</h3>
