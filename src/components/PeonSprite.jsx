@@ -6,11 +6,13 @@ import { useSalesState } from '../hooks/useSalesState';
  * (public/assets/Peon/idle/peon-idle.json) describing a clean sprite sheet of
  * uniform `cell`-px cells, `cols` per row, one row per idle variation.
  *
- * It plays a natural idle ROTATION: weighted-random pick of a variation
- * (breathing favored), play it through once, hold the rest frame briefly, then
- * pick the next — matching the art's "suggested idle rotation". A closed deal
- * triggers a quick cheer pop. Falls back to a static image if the sheet/manifest
- * can't load (e.g. before the assets are sliced), so the card never breaks.
+ * Motion model: a continuous breathing BASE loop with crossfade interpolation
+ * (adjacent frames are smoothstep-blended every rAF, so poses morph instead of
+ * snapping — this is what keeps it from looking choppy at low frame counts).
+ * Every few seconds it interjects a one-shot variation, then eases back to
+ * breathing. Events: a closed deal triggers a celebratory fidget; a long idle
+ * makes him yawn. Honors prefers-reduced-motion, pauses on hidden tabs, and
+ * falls back to the static image if the sheet/manifest can't load.
  */
 const MANIFEST_URL = '/assets/Peon/idle/peon-idle.json';
 
@@ -21,11 +23,14 @@ const PeonSprite = ({ size = 132, fallbackArt = '/assets/Peon/Peon.jpeg', label 
 
   const closedDeal = useSalesState((s) => s.closedDeal);
   const prevClosedDeal = useRef(closedDeal);
+  // The animation loop polls this for one-shot requests (e.g. a closed deal).
+  const commandRef = useRef(null);
 
-  // Quick cheer pop on a closed deal (same signal the old sprite used).
+  // Closed deal → celebratory fidget one-shot + a quick scale pop.
   useEffect(() => {
     if (closedDeal === prevClosedDeal.current) return;
     prevClosedDeal.current = closedDeal;
+    commandRef.current = 'fidget';
     setCheering(true);
     const t = setTimeout(() => setCheering(false), 680);
     return () => clearTimeout(t);
@@ -83,65 +88,107 @@ const PeonSprite = ({ size = 132, fallbackArt = '/assets/Peon/Peon.jpeg', label 
       const ctx = canvas.getContext('2d', { alpha: true });
       ctx.imageSmoothingEnabled = false; // crisp pixel art
 
-      // Build a weighted bag for natural variation selection.
-      const bag = [];
-      anims.forEach((a, i) => {
-        const w = Math.max(1, a.weight || 1);
-        for (let k = 0; k < w; k += 1) bag.push(i);
-      });
-      const pick = () => bag[Math.floor(Math.random() * bag.length)];
+      const byName = (n) => anims.find((a) => a.name === n);
+      const breathing = byName('breathing') || anims[0];
+
+      // Weighted bag of the *variations* (everything except the breathing base)
+      // that get interjected between breathing loops.
+      const vbag = [];
+      anims
+        .filter((a) => a !== breathing)
+        .forEach((a) => {
+          const w = Math.max(1, a.weight || 1);
+          for (let k = 0; k < w; k += 1) vbag.push(a);
+        });
+      const pickVariation = () =>
+        vbag.length ? vbag[Math.floor(Math.random() * vbag.length)] : breathing;
+
+      const nextGapMs = () => 3200 + Math.random() * 5200;
 
       const state = {
-        anim: anims.find((a) => a.name === 'breathing') || anims[0],
-        frame: 0,
-        elapsed: 0,
-        mode: 'playing', // playing | holding
-        holdMs: 0,
+        base: true, // looping breathing vs. a one-shot variation
+        anim: breathing,
+        playhead: 0, // continuous frame position (float)
         last: 0,
+        sinceInterjectMs: 0,
+        nextInterjectMs: nextGapMs(),
+        sinceYawnMs: 0,
       };
 
-      const draw = (anim, frame) => {
-        const sx = Math.min(frame, anim.frames - 1) * cell;
+      // Smoothstep keeps the crossfade weighted toward the two source frames
+      // (less time at the ghosty 50/50 midpoint) for a clean morph.
+      const smooth = (t) => t * t * (3 - 2 * t);
+
+      // Crossfade the two frames straddling the continuous playhead — this is
+      // what removes the choppy frame-to-frame snap.
+      const drawBlend = (anim, playhead) => {
+        const n = anim.frames;
+        const base = Math.floor(playhead);
+        const frac = playhead - base;
+        const fA = base % n;
+        const fB = (fA + 1) % n;
         const sy = anim.row * cell;
         ctx.clearRect(0, 0, cell, cell);
-        ctx.drawImage(img, sx, sy, cell, cell, 0, 0, cell, cell);
+        ctx.globalAlpha = 1;
+        ctx.drawImage(img, fA * cell, sy, cell, cell, 0, 0, cell, cell);
+        if (fB !== fA && frac > 0.001) {
+          ctx.globalAlpha = smooth(frac);
+          ctx.drawImage(img, fB * cell, sy, cell, cell, 0, 0, cell, cell);
+          ctx.globalAlpha = 1;
+        }
       };
 
       // Paint the rest pose immediately so the canvas is never blank — even if
       // the page loads on a hidden/backgrounded tab and rAF is paused.
-      draw(state.anim, 0);
+      drawBlend(breathing, 0);
 
       // Reduced motion: hold the rest frame, don't animate.
       if (reduced) return;
 
+      const startOneShot = (anim) => {
+        if (!anim) return;
+        state.base = false;
+        state.anim = anim;
+        state.playhead = 0;
+      };
+
       const tick = (ts) => {
         if (!running || document.hidden) return;
-        const dt = state.last ? ts - state.last : 0;
+        const dt = state.last ? Math.min(ts - state.last, 64) : 0; // clamp tab-switch jumps
         state.last = ts;
-        state.elapsed += dt;
+        state.sinceYawnMs += dt;
 
-        if (state.mode === 'holding') {
-          if (state.elapsed >= state.holdMs) {
-            state.anim = anims[pick()];
-            state.frame = 0;
-            state.elapsed = 0;
-            state.mode = 'playing';
-          }
-          draw(state.anim, 0);
-        } else {
-          while (state.elapsed >= frameMs) {
-            state.elapsed -= frameMs;
-            state.frame += 1;
-            if (state.frame >= state.anim.frames) {
-              // cycle complete — rest on frame 0 for a natural beat
-              state.frame = 0;
-              state.mode = 'holding';
-              state.holdMs = 160 + Math.random() * 640;
-              break;
-            }
-          }
-          draw(state.anim, state.frame);
+        // Event request (e.g. closed-deal fidget) interrupts immediately.
+        if (commandRef.current) {
+          const a = byName(commandRef.current);
+          commandRef.current = null;
+          startOneShot(a);
         }
+
+        state.playhead += dt / frameMs;
+
+        if (state.base) {
+          state.sinceInterjectMs += dt;
+          if (state.playhead >= breathing.frames) state.playhead -= breathing.frames;
+
+          if (state.sinceInterjectMs >= state.nextInterjectMs) {
+            state.sinceInterjectMs = 0;
+            state.nextInterjectMs = nextGapMs();
+            // Idle a long while → he yawns; otherwise a weighted variation.
+            const v = state.sinceYawnMs > 22000 && byName('yawn') ? byName('yawn') : pickVariation();
+            startOneShot(v);
+          }
+        } else if (state.playhead >= state.anim.frames) {
+          // one-shot done → ease back to the breathing base
+          if (state.anim.name === 'yawn') state.sinceYawnMs = 0;
+          state.base = true;
+          state.anim = breathing;
+          state.playhead = 0;
+          state.sinceInterjectMs = 0;
+          state.nextInterjectMs = nextGapMs();
+        }
+
+        drawBlend(state.anim, state.playhead);
         raf = requestAnimationFrame(tick);
       };
 
