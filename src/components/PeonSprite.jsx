@@ -72,8 +72,10 @@ const PeonSprite = ({ size = 132, fallbackArt = '/assets/Peon/Peon.jpeg', label 
       if (!running) return;
 
       const cell = manifest.cell || 128;
-      const fps = manifest.fps || 10;
-      const frameMs = 1000 / fps;
+      // Per-animation loop duration (ms) → calm, slow breathing; quick blinks.
+      // Falls back to a slow default so nothing ever plays at a frantic rate.
+      const DEFAULT_LOOP_MS = 4200;
+      const frameMsOf = (a) => (a.durationMs || DEFAULT_LOOP_MS) / a.frames;
       const anims = (manifest.animations || []).filter((a) => a.frames > 0);
       if (!anims.length) {
         setStatus('failed');
@@ -103,7 +105,8 @@ const PeonSprite = ({ size = 132, fallbackArt = '/assets/Peon/Peon.jpeg', label 
       const pickVariation = () =>
         vbag.length ? vbag[Math.floor(Math.random() * vbag.length)] : breathing;
 
-      const nextGapMs = () => 3200 + Math.random() * 5200;
+      // Long calm stretches of breathing between little actions.
+      const nextGapMs = () => 6000 + Math.random() * 8000;
 
       const state = {
         base: true, // looping breathing vs. a one-shot variation
@@ -165,7 +168,7 @@ const PeonSprite = ({ size = 132, fallbackArt = '/assets/Peon/Peon.jpeg', label 
           startOneShot(a);
         }
 
-        state.playhead += dt / frameMs;
+        state.playhead += dt / frameMsOf(state.anim);
 
         if (state.base) {
           state.sinceInterjectMs += dt;
