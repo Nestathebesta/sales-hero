@@ -385,6 +385,17 @@ h1, h2, h3, h4, h5, h6 {
   will-change: transform;
 }
 
+/* Canvas idle sprite (Peon) — the frames animate inside the canvas, so no CSS
+   idle loop here; just crisp pixel rendering + shadow, and it borrows the cheer
+   pop on a closed deal. */
+.peon-sprite {
+  display: block;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 6px 7px rgba(0, 0, 0, 0.55));
+  transform-origin: center bottom;
+  transition: opacity 0.2s ease;
+}
+
 .rank-avatar--idle {
   animation: rankIdle 2.8s ease-in-out infinite;
 }

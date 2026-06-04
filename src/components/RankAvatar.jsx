@@ -1,8 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSalesState } from '../hooks/useSalesState';
+import PeonSprite from './PeonSprite';
 
 // Ranks whose emblem image isn't in /public yet fall back to this.
 const FALLBACK = '/avatars/rank-crusader.png';
+
+// Ranks with a real sliced sprite sheet render an animated idle instead of a
+// static portrait. Add rank titles here as their idle sheets are produced.
+const SPRITE_RANKS = { Peon: PeonSprite };
 
 /**
  * The current rank's character shown in the Crusader Card, with a gentle CSS
@@ -21,6 +26,12 @@ const RankAvatar = ({ art, label, size = 132 }) => {
     const t = setTimeout(() => setCheering(false), 680);
     return () => clearTimeout(t);
   }, [closedDeal]);
+
+  // Animated sprite ranks (e.g. Peon) get their own canvas idle player.
+  const SpriteComponent = label ? SPRITE_RANKS[label] : null;
+  if (SpriteComponent) {
+    return <SpriteComponent size={size} fallbackArt={art} label={label} />;
+  }
 
   return (
     <img
