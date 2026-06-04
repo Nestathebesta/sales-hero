@@ -1,0 +1,15 @@
+{
+  "sheet": "/assets/Peon/idle/peon-idle-clean.png",
+  "cell": 128,
+  "cols": 8,
+  "fps": 10,
+  "anchor": "bottom-center",
+  "animations": [
+    { "name": "breathing",   "row": 0, "frames": 7, "weight": 5 },
+    { "name": "lookAround",  "row": 1, "frames": 7, "weight": 2 },
+    { "name": "shiftWeight", "row": 2, "frames": 7, "weight": 2 },
+    { "name": "fidget",      "row": 3, "frames": 7, "weight": 1 },
+    { "name": "blink",       "row": 4, "frames": 6, "weight": 2 },
+    { "name": "yawn",        "row": 5, "frames": 7, "weight": 1 }
+  ]
+}
