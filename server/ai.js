@@ -74,7 +74,7 @@ function summarize(state) {
   return {
     name: p.name || 'Crusader',
     level: p.level || 1,
-    title: p.title || 'Squire',
+    title: p.title || 'Peon',
     totalXP: p.totalXP || 0,
     calls,
     quotes,

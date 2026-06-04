@@ -26,13 +26,21 @@ export function xpProgressInLevel(totalXP, level) {
   return { current, needed, ceiling, floor, percent };
 }
 
-/** @type {CareerRank[]} */
+/**
+ * Career rank ladder — ordered low → high. Lower early thresholds so the first
+ * ranks come quickly. `art` is the rank emblem under /public (drop an image at
+ * that path to show it; missing files fall back to a placeholder in the UI).
+ * @type {(CareerRank & { art: string })[]}
+ */
 export const CAREER_RANKS = [
-  { minLevel: 1, title: 'Squire', unlockKey: null },
-  { minLevel: 3, title: 'Knight Errant', unlockKey: 'girl' },
-  { minLevel: 7, title: 'Crusader', unlockKey: 'boy_champion' },
-  { minLevel: 12, title: 'Commander', unlockKey: 'girl_champion' },
-  { minLevel: 20, title: 'Grand Marshal', unlockKey: null },
+  { minLevel: 1, title: 'Peon', unlockKey: null, art: '/assets/Peon/Peon.jpeg' },
+  { minLevel: 2, title: 'Scribe', unlockKey: null, art: '/assets/Scribe/Scribe.jpeg' },
+  { minLevel: 3, title: 'Messenger', unlockKey: null, art: '/assets/Messenger/Messenger.jpeg' },
+  { minLevel: 8, title: 'Crusader', unlockKey: null, art: '/assets/Crusader/Crusader.jpeg' },
+  { minLevel: 16, title: 'Veteran', unlockKey: null, art: '/assets/Veteran/Veteran.jpeg' },
+  { minLevel: 28, title: 'Whale Hunter', unlockKey: null, art: '/assets/Whale Hunter/Whale Hunter.jpeg' },
+  { minLevel: 44, title: 'Captain', unlockKey: null, art: '/assets/Captain/Captain.jpeg' },
+  { minLevel: 65, title: 'Grand Marshal', unlockKey: null, art: '/assets/Grand Marshal/Grand Marshal.jpeg' },
 ];
 
 export function getCareerTitle(level) {
@@ -41,6 +49,15 @@ export function getCareerTitle(level) {
     if (level >= rank.minLevel) title = rank.title;
   }
   return title;
+}
+
+/** Full rank object (title + art + minLevel) the player currently holds. */
+export function getCareerRank(level) {
+  let rank = CAREER_RANKS[0];
+  for (const r of CAREER_RANKS) {
+    if (level >= r.minLevel) rank = r;
+  }
+  return rank;
 }
 
 export function getUnlockedRewards(level) {

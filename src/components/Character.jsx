@@ -1,16 +1,20 @@
 import {
-  APPEARANCE_OPTIONS,
+  CAREER_RANKS,
+  getCareerRank,
   appearanceTint,
-  unlockLevelForReward,
   xpProgressInLevel,
 } from '../../shared/xp.js';
 import CrusaderSprite from './CrusaderSprite';
 
-const Character = ({ player, onCustomize }) => {
+// Ranks whose emblem image isn't in /public yet fall back to this.
+const RANK_ART_FALLBACK = '/avatars/rank-crusader.png';
+
+const Character = ({ player }) => {
   if (!player) return null;
 
   const { current, needed, percent } = xpProgressInLevel(player.totalXP, player.level);
   const heroTint = appearanceTint(player);
+  const currentRank = getCareerRank(player.level);
 
   return (
     <div className="panel hero-panel crusader-card">
@@ -22,7 +26,7 @@ const Character = ({ player, onCustomize }) => {
         </div>
         <div>
           <h3 className="agent-name">{player.name}</h3>
-          <p className="agent-rank">{player.title ?? 'Squire'}</p>
+          <p className="agent-rank">{player.title ?? 'Peon'}</p>
           <p className="agent-level">Level {player.level}</p>
         </div>
       </div>
@@ -39,34 +43,30 @@ const Character = ({ player, onCustomize }) => {
       </div>
 
       <div className="customize-section">
-        <h4 className="section-label">Rank Appearances</h4>
+        <h4 className="section-label">Career Ranks</h4>
         <div className="customization-grid">
-          {APPEARANCE_OPTIONS.map((skin) => {
-            const unlocked = !skin.rewardKey || player.rewards.includes(skin.rewardKey);
-            const isSelected = player.character === skin.character && player.skin === skin.skin;
-            const unlockAt = skin.rewardKey ? unlockLevelForReward(skin.rewardKey) : null;
+          {CAREER_RANKS.map((rank) => {
+            const unlocked = player.level >= rank.minLevel;
+            const isCurrent = rank.title === currentRank.title;
 
             return (
-              <label
-                key={skin.id}
-                className={`custom-radio-label ${!unlocked ? 'locked' : ''} ${isSelected ? 'selected' : ''}`}
+              <div
+                key={rank.title}
+                className={`custom-radio-label ${!unlocked ? 'locked' : ''} ${isCurrent ? 'selected' : ''}`}
+                title={`${rank.title} — Level ${rank.minLevel}`}
               >
-                <input
-                  type="radio"
-                  name="characterSkin"
-                  className="custom-radio"
-                  checked={isSelected}
-                  disabled={!unlocked}
-                  onChange={() => {
-                    if (unlocked) onCustomize(skin.character, skin.skin);
+                <img
+                  src={rank.art}
+                  alt={rank.title}
+                  onError={(e) => {
+                    if (e.currentTarget.src.indexOf(RANK_ART_FALLBACK) === -1) {
+                      e.currentTarget.src = RANK_ART_FALLBACK;
+                    }
                   }}
                 />
-                <img src={skin.art} alt={skin.label} />
-                <span>{skin.label}</span>
-                {!unlocked && unlockAt && (
-                  <span className="locked-tag">Lv {unlockAt}</span>
-                )}
-              </label>
+                <span>{rank.title}</span>
+                {!unlocked && <span className="locked-tag">Lv {rank.minLevel}</span>}
+              </div>
             );
           })}
         </div>

@@ -17,12 +17,16 @@ function calculateLevel(totalXP) {
   return level;
 }
 
+// KEEP IN SYNC with CAREER_RANKS in shared/xp.js (titles + minLevels).
 const CAREER_RANKS = [
-  { minLevel: 1, title: 'Squire', unlockKey: null },
-  { minLevel: 3, title: 'Knight Errant', unlockKey: 'girl' },
-  { minLevel: 7, title: 'Crusader', unlockKey: 'boy_champion' },
-  { minLevel: 12, title: 'Commander', unlockKey: 'girl_champion' },
-  { minLevel: 20, title: 'Grand Marshal', unlockKey: null },
+  { minLevel: 1, title: 'Peon', unlockKey: null },
+  { minLevel: 2, title: 'Scribe', unlockKey: null },
+  { minLevel: 3, title: 'Messenger', unlockKey: null },
+  { minLevel: 8, title: 'Crusader', unlockKey: null },
+  { minLevel: 16, title: 'Veteran', unlockKey: null },
+  { minLevel: 28, title: 'Whale Hunter', unlockKey: null },
+  { minLevel: 44, title: 'Captain', unlockKey: null },
+  { minLevel: 65, title: 'Grand Marshal', unlockKey: null },
 ];
 
 function getCareerTitle(level) {
