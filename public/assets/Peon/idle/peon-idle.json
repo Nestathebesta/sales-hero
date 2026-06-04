@@ -4,12 +4,13 @@
   "cols": 8,
   "fps": 10,
   "anchor": "bottom-center",
+  "crossfade": false,
   "animations": [
-    { "name": "breathing",   "row": 0, "frames": 7, "weight": 6, "durationMs": 4600 },
-    { "name": "lookAround",  "row": 1, "frames": 7, "weight": 2, "durationMs": 5200 },
-    { "name": "shiftWeight", "row": 2, "frames": 7, "weight": 2, "durationMs": 4600 },
-    { "name": "fidget",      "row": 3, "frames": 7, "weight": 1, "durationMs": 3000 },
-    { "name": "blink",       "row": 4, "frames": 6, "weight": 2, "durationMs": 1000 },
-    { "name": "yawn",        "row": 5, "frames": 7, "weight": 1, "durationMs": 4200 }
+    { "name": "breathing",   "row": 0, "frames": 7, "weight": 6, "durationMs": 1750 },
+    { "name": "lookAround",  "row": 1, "frames": 7, "weight": 2, "durationMs": 1900 },
+    { "name": "shiftWeight", "row": 2, "frames": 7, "weight": 2, "durationMs": 1750 },
+    { "name": "fidget",      "row": 3, "frames": 7, "weight": 1, "durationMs": 1300 },
+    { "name": "blink",       "row": 4, "frames": 6, "weight": 2, "durationMs": 520 },
+    { "name": "yawn",        "row": 5, "frames": 7, "weight": 1, "durationMs": 2000 }
   ]
 }
