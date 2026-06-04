@@ -11,7 +11,7 @@ require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 const express = require('express');
 const cors = require('cors');
 const { processEvent } = require('./xpCalculator');
-const { readState, writeState, pushGlobalEvent } = require('./state');
+const { readState, writeState, pushGlobalEvent, defaultState } = require('./state');
 const { generateBriefing, generateNextAction, generateDailyRecap } = require('./ai');
 const { classifyEventTitle, deriveEntity, slug } = require('./classify');
 const { syncStructuredTasks } = require('./structured');
@@ -144,6 +144,26 @@ app.get('/api/state', async (req, res) => {
   } catch (err) {
     console.error('State load failed:', err.message);
     res.status(500).json({ error: 'Failed to load state' });
+  }
+});
+
+// Start over — reset the whole game to a fresh character (clears XP, level,
+// stats, badges, leads, and quests). The current player's name/character/skin
+// are preserved. The next Structured sync will re-populate today's quests.
+app.post('/api/player/reset', async (req, res) => {
+  try {
+    const prev = (await readState()).player;
+    const fresh = JSON.parse(JSON.stringify(defaultState));
+    // keep cosmetic identity, wipe all progress
+    fresh.player.name = prev.name || fresh.player.name;
+    fresh.player.character = prev.character || fresh.player.character;
+    fresh.player.skin = prev.skin || fresh.player.skin;
+    await writeState(fresh);
+    const player = (await readState()).player;
+    return res.json({ success: true, player });
+  } catch (err) {
+    console.error('Reset failed:', err.message);
+    return res.status(500).json({ error: 'Failed to reset character' });
   }
 });
 
