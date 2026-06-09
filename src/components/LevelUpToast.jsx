@@ -1,8 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Shield, Crown } from 'lucide-react';
+import { Shield, Crown, X } from 'lucide-react';
 
 const LevelUpToast = ({ level, title, isRankUp = false, onDismiss }) => {
   const [visible, setVisible] = useState(true);
+
+  const dismiss = () => {
+    setVisible(false);
+    onDismiss?.();
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -25,6 +30,9 @@ const LevelUpToast = ({ level, title, isRankUp = false, onDismiss }) => {
         <p className="level-up-title">{isRankUp ? title : `Level ${level}`}</p>
         <p className="level-up-level">{isRankUp ? `Level ${level} · ${title}` : title}</p>
       </div>
+      <button type="button" className="toast-close" onClick={dismiss} aria-label="Dismiss notification">
+        <X size={14} aria-hidden="true" />
+      </button>
     </div>
   );
 };

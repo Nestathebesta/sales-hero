@@ -53,6 +53,14 @@ export const ANIM_TIMING = {
 };
 
 /**
+ * Per-frame idle durations (ms). Holding the "rest" extremes longer than the
+ * transition frames gives the breathing an ease-in/ease-out feel instead of a
+ * mechanical metronome tick. Falls back to ANIM_TIMING.idleFrameMs if missing.
+ * @type {number[]}
+ */
+export const IDLE_FRAME_MS = [340, 170, 340, 170];
+
+/**
  * Draw a single sprite cell, cleared, into the destination square.
  * @param {CanvasRenderingContext2D} ctx
  * @param {HTMLImageElement} image

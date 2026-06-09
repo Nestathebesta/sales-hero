@@ -34,7 +34,14 @@ const Character = ({ player }) => {
           <span>EXP <strong>{player.totalXP}</strong></span>
           <span><strong>{current}</strong> / {needed} to next</span>
         </div>
-        <div className="progress-container">
+        <div
+          className="progress-container"
+          role="progressbar"
+          aria-valuenow={current}
+          aria-valuemin={0}
+          aria-valuemax={needed}
+          aria-label={`Experience toward next level: ${current} of ${needed}`}
+        >
           <div className="progress-bar" style={{ width: `${percent}%` }} />
           <div className="progress-text">{percent}%</div>
         </div>

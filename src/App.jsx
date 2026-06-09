@@ -112,6 +112,13 @@ function App() {
 
   const player = gameState?.player;
   const leadCount = gameState ? Object.keys(gameState.leads).length : 0;
+  const openQuestCount = gameState
+    ? Object.values(gameState.tasks ?? {}).filter((t) => !t.completed).length
+    : 0;
+
+  // Live counts surfaced on the tabs themselves, so users can see where work
+  // is waiting without clicking through each section.
+  const TAB_COUNTS = { leads: leadCount, quests: openQuestCount };
 
   return (
     <div className="app-container">
@@ -192,18 +199,24 @@ function App() {
       </aside>
 
       <main className="main-content">
-        <nav className="feature-tabs" aria-label="Main sections">
-          {TABS.map(({ id, label, Icon }) => (
-            <button
-              key={id}
-              type="button"
-              className={`tab-btn ${activeTab === id ? 'active' : ''}`}
-              onClick={() => setActiveTab(id)}
-            >
-              <Icon size={14} aria-hidden="true" />
-              {label}
-            </button>
-          ))}
+        <nav className="feature-tabs" role="tablist" aria-label="Main sections">
+          {TABS.map(({ id, label, Icon }) => {
+            const count = TAB_COUNTS[id];
+            return (
+              <button
+                key={id}
+                type="button"
+                role="tab"
+                aria-selected={activeTab === id}
+                className={`tab-btn ${activeTab === id ? 'active' : ''}`}
+                onClick={() => setActiveTab(id)}
+              >
+                <Icon size={14} aria-hidden="true" />
+                {label}
+                {count > 0 && <span className="tab-count">{count}</span>}
+              </button>
+            );
+          })}
         </nav>
 
         {gameState && activeTab === 'leads' && (

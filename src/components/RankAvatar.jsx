@@ -10,14 +10,20 @@ const FALLBACK = '/avatars/rank-crusader.png';
 const SPRITE_RANKS = { Peon: PeonSprite };
 
 /**
- * The current rank's character shown in the Crusader Card, with a gentle CSS
- * "idle" animation (breathing/float). On a closed deal it plays a quick cheer
- * pop (driven by salesState.closedDeal, same signal the old sprite used).
+ * The current rank's character shown in the Crusader Card, with a layered CSS
+ * "idle" animation (breathing bob + subtle sway) over a grounding contact
+ * shadow. On a closed deal it plays a squash-and-stretch cheer pop (driven by
+ * salesState.closedDeal, same signal the old sprite used).
  */
 const RankAvatar = ({ art, label, size = 132 }) => {
   const [cheering, setCheering] = useState(false);
   const closedDeal = useSalesState((s) => s.closedDeal);
   const prevClosedDeal = useRef(closedDeal);
+
+  // Start each instance partway through its idle cycle so multiple avatars
+  // (and remounts) never bob in lock-step — reads as alive, not mechanical.
+  // Lazy initializer: the random offset is computed once per mount.
+  const [idleDelay] = useState(() => `-${(Math.random() * 3.6).toFixed(2)}s`);
 
   useEffect(() => {
     if (closedDeal === prevClosedDeal.current) return;
@@ -29,21 +35,25 @@ const RankAvatar = ({ art, label, size = 132 }) => {
 
   // Animated sprite ranks (e.g. Peon) get their own canvas idle player.
   const SpriteComponent = label ? SPRITE_RANKS[label] : null;
-  if (SpriteComponent) {
-    return <SpriteComponent size={size} fallbackArt={art} label={label} />;
-  }
 
   return (
-    <img
-      src={art || FALLBACK}
-      alt={label ? `${label} — idle` : 'Rank avatar'}
-      className={`rank-avatar ${cheering ? 'rank-avatar--cheer' : 'rank-avatar--idle'}`}
-      style={{ height: size }}
-      draggable={false}
-      onError={(e) => {
-        if (e.currentTarget.src.indexOf(FALLBACK) === -1) e.currentTarget.src = FALLBACK;
-      }}
-    />
+    <div className="avatar-stage">
+      {SpriteComponent ? (
+        <SpriteComponent size={size} fallbackArt={art} label={label} />
+      ) : (
+        <img
+          src={art || FALLBACK}
+          alt={label ? `${label} — idle` : 'Rank avatar'}
+          className={`rank-avatar ${cheering ? 'rank-avatar--cheer' : 'rank-avatar--idle'}`}
+          style={{ height: size, animationDelay: cheering ? undefined : idleDelay }}
+          draggable={false}
+          onError={(e) => {
+            if (e.currentTarget.src.indexOf(FALLBACK) === -1) e.currentTarget.src = FALLBACK;
+          }}
+        />
+      )}
+      <span className="avatar-shadow" aria-hidden="true" />
+    </div>
   );
 };
 

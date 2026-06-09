@@ -7,6 +7,7 @@ import {
   DISPLAY_FRAME_SIZE,
   DISPLAY_SIZE,
   drawSpriteCell,
+  IDLE_FRAME_MS,
   IDLE_LOOP,
   IDLE_RESTART_INDEX,
 } from '../game/crusaderSpriteSheet';
@@ -88,10 +89,13 @@ const CrusaderSprite = ({ className = '', size = DISPLAY_SIZE, tint = null }) =>
         anim.elapsed += dt;
 
         if (anim.mode === 'idle') {
-          const frameMs = ANIM_TIMING.idleFrameMs;
+          // Per-frame durations: rest extremes hold longer than transitions,
+          // which reads as eased breathing instead of a metronome tick.
+          let frameMs = IDLE_FRAME_MS[anim.frameIndex] ?? ANIM_TIMING.idleFrameMs;
           while (anim.elapsed >= frameMs) {
             anim.elapsed -= frameMs;
             anim.frameIndex = (anim.frameIndex + 1) % IDLE_LOOP.length;
+            frameMs = IDLE_FRAME_MS[anim.frameIndex] ?? ANIM_TIMING.idleFrameMs;
           }
           paint(IDLE_LOOP[anim.frameIndex]);
         } else {

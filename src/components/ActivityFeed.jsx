@@ -30,7 +30,7 @@ const ActivityFeed = ({ events }) => {
       <div className="activity-feed-label">Activity Feed</div>
       <div className="activity-feed-text">
         {displayText}
-        <span className="cursor-blink" aria-hidden="true">▼</span>
+        <span className="cursor-blink" aria-hidden="true">▌</span>
       </div>
     </div>
   );

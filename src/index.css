@@ -49,6 +49,33 @@ body {
   box-sizing: border-box;
 }
 
+/* Keyboard navigation: one consistent, visible focus ring everywhere.
+   :focus-visible keeps mouse clicks clean while protecting keyboard users. */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Uniform pressed feedback so every control responds to the click itself. */
+button:active:not(:disabled) {
+  transform: translateY(1px) scale(0.985);
+}
+
+/* Themed scrollbars for inner scroll regions (Chronicle log, etc.) */
+.quest-log {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(212, 175, 55, 0.35) rgba(0, 0, 0, 0.25);
+}
+
+.quest-log::-webkit-scrollbar { width: 8px; }
+.quest-log::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.25); border-radius: 4px; }
+.quest-log::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.35);
+  border-radius: 4px;
+}
+.quest-log::-webkit-scrollbar-thumb:hover { background: rgba(212, 175, 55, 0.55); }
+
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--display-font);
   font-weight: 700;
@@ -235,6 +262,31 @@ h1, h2, h3, h4, h5, h6 {
   to { transform: translateX(0); opacity: 1; }
 }
 
+/* Manual dismiss — users shouldn't have to wait out a timer to clear a toast. */
+.toast-close {
+  position: relative;
+  z-index: 1;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin: -0.35rem -0.5rem 0 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+
+.toast-close:hover {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.08);
+}
+
 .level-up-icon {
   color: var(--royal-bright);
   flex-shrink: 0;
@@ -352,12 +404,14 @@ h1, h2, h3, h4, h5, h6 {
 /* Crusader portal: dark royal-blue glow behind the transparent knight,
    ringed by a gold frame. */
 .avatar-frame--sprite {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   min-width: 140px;
   min-height: 140px;
   padding: 6px;
+  overflow: hidden;
   background:
     radial-gradient(circle at 50% 36%, rgba(61, 111, 214, 0.30), rgba(8, 12, 20, 0.96) 72%);
   border: 2px solid rgba(212, 175, 55, 0.7);
@@ -367,14 +421,36 @@ h1, h2, h3, h4, h5, h6 {
     inset 0 0 26px rgba(61, 111, 214, 0.20);
 }
 
+/* Slow ambient "portal" glow behind the character — a long, gentle pulse that
+   keeps the card alive even when the sprite is between idle variations. */
+.avatar-frame--sprite::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 40%, rgba(91, 138, 240, 0.28), transparent 62%);
+  animation: portalGlow 5.2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes portalGlow {
+  0%, 100% { opacity: 0.45; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avatar-frame--sprite::before { animation: none; opacity: 0.6; }
+}
+
 .crusader-sprite {
   display: block;
   image-rendering: auto;
   filter: drop-shadow(0 5px 6px rgba(0, 0, 0, 0.5));
 }
 
-/* Rank character portrait in the Crusader Card — gentle idle "breathing/float",
-   with a quick cheer pop on a closed deal. */
+/* Rank character portrait in the Crusader Card — layered idle motion:
+   a slow breathing bob + a subtle sway, with a quick cheer pop on a closed
+   deal. The .avatar-stage wrapper adds a grounding shadow that breathes in
+   counterpoint so the character feels anchored, not floating. */
 .rank-avatar {
   display: block;
   width: auto;
@@ -396,28 +472,76 @@ h1, h2, h3, h4, h5, h6 {
   transition: opacity 0.2s ease;
 }
 
+/* Stage wrapper: positions the grounding shadow under the character. */
+.avatar-stage {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.avatar-stage > img,
+.avatar-stage > canvas {
+  position: relative;
+  z-index: 1;
+}
+
+/* Elliptical contact shadow — scales/fades opposite the bob, selling weight. */
+.avatar-shadow {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  width: 58%;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.5), transparent 70%);
+  transform: translateX(-50%);
+  transform-origin: center;
+  animation: shadowBreathe 3.6s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
 .rank-avatar--idle {
-  animation: rankIdle 2.8s ease-in-out infinite;
+  /* Two layered loops at different periods so the motion never repeats
+     exactly — far more organic than a single sine bob. */
+  animation:
+    rankIdle 3.6s ease-in-out infinite,
+    rankSway 7.4s ease-in-out infinite;
 }
 
 .rank-avatar--cheer {
-  animation: rankCheer 0.68s ease-out;
+  animation: rankCheer 0.68s cubic-bezier(0.22, 1.4, 0.36, 1);
 }
 
 @keyframes rankIdle {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-4px) scale(1.015); }
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  50% { transform: translateY(-4px) scale(0.995, 1.012); }
+}
+
+@keyframes rankSway {
+  0%, 100% { rotate: 0deg; }
+  30% { rotate: 0.6deg; }
+  70% { rotate: -0.6deg; }
+}
+
+@keyframes shadowBreathe {
+  0%, 100% { transform: translateX(-50%) scaleX(1); opacity: 0.85; }
+  50% { transform: translateX(-50%) scaleX(0.88); opacity: 0.6; }
 }
 
 @keyframes rankCheer {
-  0% { transform: translateY(0) scale(1); }
-  35% { transform: translateY(-10px) scale(1.1); }
-  100% { transform: translateY(0) scale(1); }
+  0% { transform: translateY(0) scale(1, 1); }
+  20% { transform: translateY(2px) scale(1.06, 0.92); }   /* anticipation squash */
+  55% { transform: translateY(-12px) scale(0.96, 1.08); } /* leap + stretch */
+  80% { transform: translateY(1px) scale(1.04, 0.96); }   /* landing squash */
+  100% { transform: translateY(0) scale(1, 1); }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .rank-avatar--idle,
-  .rank-avatar--cheer { animation: none; }
+  .rank-avatar--cheer,
+  .avatar-shadow { animation: none; }
 }
 
 .agent-portrait {
@@ -570,6 +694,35 @@ h1, h2, h3, h4, h5, h6 {
   background: linear-gradient(90deg, var(--gold-dim), var(--gold));
   transition: width 0.35s ease;
   border-radius: 999px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Slow light sweep across the XP bar — a quiet "alive" cue that draws the eye
+   to progress without demanding attention. */
+.progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -45%;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(
+    105deg,
+    transparent,
+    rgba(255, 255, 255, 0.35) 50%,
+    transparent
+  );
+  animation: xpShimmer 3.8s ease-in-out infinite;
+}
+
+@keyframes xpShimmer {
+  0% { left: -45%; }
+  55%, 100% { left: 105%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress-bar::after { animation: none; opacity: 0; }
 }
 
 .progress-text {
@@ -822,12 +975,18 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   gap: 0.35rem;
   margin-bottom: 0;
+  /* Never trap tabs on narrow screens — let them scroll horizontally. */
+  overflow-x: auto;
+  scrollbar-width: none;
 }
+
+.feature-tabs::-webkit-scrollbar { display: none; }
 
 .tab-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
+  flex-shrink: 0;
   background: rgba(0, 0, 0, 0.25);
   border: 1px solid rgba(255, 255, 255, 0.08);
   padding: 0.65rem 1.1rem;
@@ -847,6 +1006,7 @@ h1, h2, h3, h4, h5, h6 {
 .tab-btn:hover:not(.active) {
   color: var(--text-main);
   border-color: rgba(212, 175, 55, 0.25);
+  transform: translateY(1px);
 }
 
 .tab-btn.active {
@@ -855,6 +1015,41 @@ h1, h2, h3, h4, h5, h6 {
   transform: translateY(0);
   padding-bottom: 0.75rem;
   border-color: rgba(212, 175, 55, 0.4);
+}
+
+/* Live count pill on a tab — shows where work is waiting at a glance. */
+.tab-count {
+  font-family: var(--body-font);
+  font-size: 0.62rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0;
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  padding: 0.18rem 0.42rem;
+  min-width: 1.1rem;
+  text-align: center;
+}
+
+.tab-btn.active .tab-count {
+  color: #1a1408;
+  background: var(--gold);
+}
+
+/* Tab panels fade/slide in on mount so section switches feel intentional
+   rather than abrupt. */
+.main-content > .panel {
+  animation: panelIn 0.22s ease-out;
+}
+
+@keyframes panelIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .main-content > .panel { animation: none; }
 }
 
 /* Forms & actions */
